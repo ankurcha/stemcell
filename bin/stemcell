@@ -22,17 +22,17 @@ module StemCellBuilderCLI
 
     desc "ubuntu <name>", "Build a new ubuntu stemcell named <name>"
     def ubuntu(name)
-      Bosh::Agent::StemCell::UbuntuBuilder.new({:name => name}.merge(options).reject { |k, v| v.nil? }, {}).run
+      Bosh::Agent::StemCell::UbuntuBuilder.new(options.merge({:name => name}).reject { |k, v| v.nil? }, {}).run
     end
 
     desc "redhat <name>", "Build a new redhat stemcell named <name>"
     def redhat(name)
-      Bosh::Agent::StemCell::RedhatBuilder.new({:name => name}.merge(options).reject { |k, v| v.nil? }, {}).run
+      Bosh::Agent::StemCell::RedhatBuilder.new(options.merge({:name => name}).reject { |k, v| v.nil? }, {}).run
     end
 
     desc "noop <name>", "Build a new noop stemcell named <name> [this is good for testing only]"
     def noop(name)
-      Bosh::Agent::StemCell::NoOpBuilder.new({:name => name}.merge(options).reject { |k, v| v.nil? }, {}).run
+      Bosh::Agent::StemCell::NoOpBuilder.new(options.merge({:name => name}).reject { |k, v| v.nil? }, {}).run
     end
 
   end

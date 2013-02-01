@@ -113,8 +113,7 @@ module Bosh::Agent::StemCell
       bosh_protocol = Bosh::Agent::BOSH_PROTOCOL
       agent_gem_file = File.expand_path("bosh_agent-#{agent_version}.gem", Dir.pwd)
       definitions_dir = File.expand_path(File.join(File.dirname(__FILE__), "..", 'templates'))
-
-      opts = opts.deep_merge({:name => 'bosh-stemcell',
+      merged_opts = opts.deep_merge({:name => 'bosh-stemcell',
                               :logger => Logger.new(STDOUT),
                               :target => nil,
                               :container => 'vbox',
@@ -129,7 +128,7 @@ module Bosh::Agent::StemCell
                               :iso_md5 => nil,
                               :iso_filename => nil
                              })
-      opts.each do |k, v|
+      merged_opts.each do |k, v|
         instance_variable_set("@#{k}", v)
         # if you want accessors:
         eigenclass = class<<self;
@@ -177,9 +176,9 @@ module Bosh::Agent::StemCell
           unless Kernel.system("gem build bosh_agent.gemspec")
             raise "Unable to build Bosh Agent gem"
           end
-          # copy gem to definitions
-          FileUtils.mv "bosh_agent-#@agent_version.gem", File.join(@definition_dest_path, "_bosh_agent.gem")
         end
+        # copy gem to definitions
+        FileUtils.mv(File.join(@agent_src_path, "bosh_agent-#@agent_version.gem"), File.join(@definition_dest_path, "_bosh_agent.gem"))
       else
         FileUtils.cp @agent_src_path, File.join(@definition_dest_path, "_bosh_agent.gem")
       end
