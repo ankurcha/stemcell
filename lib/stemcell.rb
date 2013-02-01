@@ -112,7 +112,7 @@ module Bosh::Agent::StemCell
       agent_version = Bosh::Agent::VERSION
       bosh_protocol = Bosh::Agent::BOSH_PROTOCOL
       agent_gem_file = File.expand_path("bosh_agent-#{agent_version}.gem", Dir.pwd)
-      definitions_dir = File.expand_path(File.join(File.dirname(__FILE__), "..", "..", 'templates'))
+      definitions_dir = File.expand_path(File.join(File.dirname(__FILE__), "..", 'templates'))
 
       opts = opts.deep_merge({:name => 'bosh-stemcell',
                               :logger => Logger.new(STDOUT),
@@ -187,7 +187,8 @@ module Bosh::Agent::StemCell
 
     # Copies the veewee definition directory from ../definition/@type to @prefix/definitions/@name
     def copy_definitions
-      definition_src_path = File.expand_path(@definitions_dir, @type)
+      definition_src_path = File.join(@definitions_dir, @type)
+      @logger.info "TYPE: #@type"
       @definition_dest_path = File.join('definitions', @name)
 
       @logger.info "Copying definition from #{definition_src_path} to #@definition_dest_path"
@@ -197,15 +198,13 @@ module Bosh::Agent::StemCell
         FileUtils.cp_r Dir.glob("#{definition_src_path}/*"), @definition_dest_path
 
         # Compile erb files
-        Dir.glob(File.join(@definition_dest_path, '*.erb')) {|erb_file|
+        Dir.glob(File.join(@definition_dest_path, '*.erb')) { |erb_file|
+          new_file_path = erb_file.gsub(/\.erb$/,'')
+          @logger.info "Compiling erb #{erb_file} to #{new_file_path}"
 
-          old_file_path = File.join @definition_dest_path, erb_file
-          new_file_path = File.join @definition_dest_path, erb_file.gsub(/.erb/,'')
-
-          File.open(new_file_path, 'w') { |f|
-            @logger.info "Compiling erb #{old_file_path} to #{new_file_path}"
-            f.write ERB.new(File.read(old_file_path, 'r')).result(binding)
-            File.delete old_file_path
+          File.open(new_file_path, "w"){|f|
+            f.write(ERB.new(File.read(File.expand_path(erb_file))).result(binding))
+            File.delete erb_file
           }
         }
 

@@ -4,7 +4,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
 
   before(:each) do
     @log = Logger.new(STDOUT)
-    @log.level = Logger::WARN
+    @log.level = Logger::DEBUG
     @stemcell = Bosh::Agent::StemCell::BaseBuilder.new({:type => "testing-stemcell", :logger => @log}, {})
   end
 
@@ -72,6 +72,19 @@ describe Bosh::Agent::StemCell::BaseBuilder do
   it "Should have a properly initialized work directory" do
     expect { Dir.exists @stemcell.prefix }.to be_true
     expect { Dir.exists @stemcell.prefix }.to be_true
+  end
+
+  it "Compiles all the erb files as a part of the setup" do
+    prefix_dir = Dir.mktmpdir
+    agent_file = File.join(prefix_dir, "bosh-agent.gem")
+    FileUtils.touch agent_file
+    @stemcell = Bosh::Agent::StemCell::BaseBuilder.new({:type => "noop", :logger => @log, :prefix => prefix_dir, :agent_src_path => agent_file}, {})
+    Dir.chdir(prefix_dir) do
+      @stemcell.setup
+      filename = File.join(prefix_dir, "definitions", @stemcell.name, "erbtest.txt")
+      File.exists?(filename).should eq true
+      File.read(File.join(prefix_dir, "definitions", @stemcell.name, "erbtest.txt")).should eq @stemcell.name
+    end
   end
 
   it "Should invoke the methods in the correct order (setup -> build_vm -> package_vm -> finalize)" do
