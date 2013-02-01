@@ -24,15 +24,6 @@ module Bosh::Agent::StemCell
         FileUtils.mv @target, "#@target.bak"
       end
 
-      # register a destructor
-      #ObjectSpace.define_finalizer(self, self.method(:finalize))
-    end
-
-    # Destructor that performs the removal of the @prefix at the time when process is complete and
-    # GC reclaims this object
-    def finalize(object_id)
-      #@logger.info "Removing #@prefix"
-      #FileUtils.remove_entry_secure @prefix if @prefix != nil
     end
 
     # This method does the setup, this implementation takes care of copying over the
@@ -51,11 +42,8 @@ module Bosh::Agent::StemCell
       end
 
       @logger.info "Export built VM #@name to #@prefix"
-      Dir.chdir(@prefix) do
-        unless Kernel.system "vagrant basebox export '#@name'"
-          raise "Unable to export VM #@name: vagrant basebox export '#@name'"
-        end
-        FileUtils.mv "#@name.box", @prefix
+      unless Kernel.system "vagrant basebox export '#@name'"
+        raise "Unable to export VM #@name: vagrant basebox export '#@name'"
       end
 
       @logger.debug "Sending veewee destroy for #@name"
@@ -69,21 +57,21 @@ module Bosh::Agent::StemCell
     # @param [Array] files List of file paths that need to be packaged
     def package_stemcell(files=[])
       unless files.empty?
-        Dir.chdir(@prefix) {
-          files_str = files.join(" ")
-          @logger.info "Packaging #{files_str} to #@target"
-          unless Kernel.system("tar -cvf #@target #{files_str}")
-            raise "unable to package #{files_str} into a stemcell"
-          end
-        }
+        files_str = files.join(" ")
+        @logger.info "Packaging #{files_str} to #@target"
+        unless Kernel.system("tar -cvf #@target #{files_str}")
+          raise "unable to package #{files_str} into a stemcell"
+        end
       end
     end
 
     # Main execution method that sets up, builds the VM and packages the stemcell
     def run
-      setup
-      build_vm
-      package_stemcell
+      Dir.chdir(@prefix) do
+        setup
+        build_vm
+        package_stemcell
+      end
     end
 
     protected
@@ -109,11 +97,8 @@ module Bosh::Agent::StemCell
     # @@return Exitstatus of the Kernel#system command
     def execute_veewee_cmd(command="")
       cmd = "veewee #@container #{command}"
-      @logger.info "Changing to #@prefix"
-      Dir.chdir(@prefix) do
-        @logger.debug "Executing: #{cmd}"
-        return Kernel.system cmd
-      end
+      @logger.debug "Executing: #{cmd}"
+      Kernel.system cmd
     end
 
 
@@ -187,7 +172,7 @@ module Bosh::Agent::StemCell
     # Copies the veewee definition directory from ../definition/@type to @prefix/definitions/@name
     def copy_definitions
       definition_src_path = File.expand_path(File.join(File.dirname(__FILE__), "..", "definitions", @type))
-      @definition_dest_path = File.join(@prefix, "definitions", @name)
+      @definition_dest_path = File.join("definitions", @name)
       @logger.info "Copying definition from #{definition_src_path} to #@definition_dest_path"
       if Dir.exists?(definition_src_path)
         FileUtils.mkdir_p @definition_dest_path
