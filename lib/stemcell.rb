@@ -1,5 +1,7 @@
 require 'veewee'
 require 'deep_merge'
+require 'erb'
+require 'digest/md5'
 
 module Bosh::Agent::StemCell
 
@@ -110,7 +112,7 @@ module Bosh::Agent::StemCell
       agent_version = Bosh::Agent::VERSION
       bosh_protocol = Bosh::Agent::BOSH_PROTOCOL
       agent_gem_file = File.expand_path("bosh_agent-#{agent_version}.gem", Dir.pwd)
-      definitions_dir = File.expand_path(File.join(File.dirname(__FILE__), "..", "..", 'definitions'))
+      definitions_dir = File.expand_path(File.join(File.dirname(__FILE__), "..", "..", 'templates'))
 
       opts = opts.deep_merge({:name => 'bosh-stemcell',
                               :logger => Logger.new(STDOUT),
@@ -122,7 +124,10 @@ module Bosh::Agent::StemCell
                               :agent_src_path => agent_gem_file,
                               :agent_version => agent_version, :bosh_protocol => bosh_protocol,
                               :architecture => 'x86_64',
-                              :prefix => Dir.pwd
+                              :prefix => Dir.pwd,
+                              :iso => nil,
+                              :iso_md5 => nil,
+                              :iso_filename => nil
                              })
       opts.each do |k, v|
         instance_variable_set("@#{k}", v)
@@ -132,6 +137,15 @@ module Bosh::Agent::StemCell
         end
         eigenclass.class_eval do
           attr_accessor k
+        end
+      end
+
+      if @iso
+        unless @iso_md5
+          raise "MD5 must be specified is ISO is specified"
+        end
+        unless @iso_filename
+          @iso_filename = File.basename @iso
         end
       end
       # Simple debug loop
@@ -173,12 +187,28 @@ module Bosh::Agent::StemCell
 
     # Copies the veewee definition directory from ../definition/@type to @prefix/definitions/@name
     def copy_definitions
-      definition_src_path = File.expand_path(File.join(File.dirname(__FILE__), "..", "definitions", @type))
-      @definition_dest_path = File.join("definitions", @name)
+      definition_src_path = File.expand_path(@definitions_dir, @type)
+      @definition_dest_path = File.join('definitions', @name)
+
       @logger.info "Copying definition from #{definition_src_path} to #@definition_dest_path"
+
       if Dir.exists?(definition_src_path)
         FileUtils.mkdir_p @definition_dest_path
         FileUtils.cp_r Dir.glob("#{definition_src_path}/*"), @definition_dest_path
+
+        # Compile erb files
+        Dir.glob(File.join(@definition_dest_path, '*.erb')) {|erb_file|
+
+          old_file_path = File.join @definition_dest_path, erb_file
+          new_file_path = File.join @definition_dest_path, erb_file.gsub(/.erb/,'')
+
+          File.open(new_file_path, 'w') { |f|
+            @logger.info "Compiling erb #{old_file_path} to #{new_file_path}"
+            f.write ERB.new(File.read(old_file_path, 'r')).result(binding)
+            File.delete old_file_path
+          }
+        }
+
       else
         raise "Definition for '#{type}' does not exist at path '#{definition_src_path}'"
       end
