@@ -81,8 +81,11 @@ describe Bosh::Agent::StemCell::BaseBuilder do
     Dir.chdir(@prefix_dir) do
       @stemcell.setup
       filename = File.join(@prefix_dir, "definitions", @stemcell.name, "erbtest.txt")
+      regular_filename = File.join(@prefix_dir, "definitions", @stemcell.name, "test.txt")
       File.exists?(filename).should eq true
+      File.exists?(regular_filename).should eq true
       File.read(File.join(@prefix_dir, "definitions", @stemcell.name, "erbtest.txt")).should eq @stemcell.name
+      File.read(File.join(@prefix_dir, "definitions", @stemcell.name, "test.txt")).should eq "## This is a test ##"
     end
   end
 
