@@ -11,6 +11,8 @@ module Bosh::Agent::StemCell
 
   class BaseBuilder
 
+    attr_accessor :manifest
+
     def initialize(opts = {}, manifest={})
       initialize_instance_vars(opts)
       @manifest = merge_manifest(manifest)
@@ -110,18 +112,18 @@ module Bosh::Agent::StemCell
       agent_gem_file = File.expand_path("bosh_agent-#{agent_version}.gem", Dir.pwd)
       definitions_dir = File.expand_path(File.join(File.dirname(__FILE__), "..", "..", 'definitions'))
 
-      opts = {:name => 'bosh-stemcell',
-              :logger => Logger.new(STDOUT),
-              :target => nil,
-              :container => 'vbox',
-              :infrastructure => 'vsphere',
-              :definitions_dir => definitions_dir,
-              :type => nil,
-              :agent_src_path => agent_gem_file,
-              :agent_version => agent_version, :bosh_protocol => bosh_protocol,
-              :architecture => 'x86_64',
-              :prefix => Dir.pwd
-      }.merge(opts)
+      opts = opts.deep_merge({:name => 'bosh-stemcell',
+                              :logger => Logger.new(STDOUT),
+                              :target => nil,
+                              :container => 'vbox',
+                              :infrastructure => 'vsphere',
+                              :definitions_dir => definitions_dir,
+                              :type => nil,
+                              :agent_src_path => agent_gem_file,
+                              :agent_version => agent_version, :bosh_protocol => bosh_protocol,
+                              :architecture => 'x86_64',
+                              :prefix => Dir.pwd
+                             })
       opts.each do |k, v|
         instance_variable_set("@#{k}", v)
         # if you want accessors:
@@ -141,15 +143,15 @@ module Bosh::Agent::StemCell
     # This method creates the stemcell manifest
     def merge_manifest(manifest={})
       # perform a deep_merge of the provided manifest with the defaults
-      {
-          :name => @name,
-          :version => @agent_version,
-          :bosh_protocol => @bosh_protocol,
-          :cloud_properties => {
-              :infrastructure => @infrastructure,
-              :architecture => @architecture
-          }
-      }.deep_merge(manifest)
+      manifest.deep_merge({
+                              :name => @name,
+                              :version => @agent_version,
+                              :bosh_protocol => @bosh_protocol,
+                              :cloud_properties => {
+                                  :infrastructure => @infrastructure,
+                                  :architecture => @architecture
+                              }
+                          })
     end
 
     # Packages the agent into a bosh_agent gem and copies it over to @definition_dest_path

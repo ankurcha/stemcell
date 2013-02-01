@@ -6,7 +6,7 @@ module Bosh::Agent::StemCell
 
     def initialize(opts={}, manifest={})
       @counter = 0
-      super({:logger => Logger.new(STDOUT), :type => "noop"}.merge(opts), manifest)
+      super(opts.merge({:type => "noop"}), manifest)
     end
 
     def build_vm

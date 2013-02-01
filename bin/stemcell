@@ -15,8 +15,8 @@ module StemCellBuilderCLI
     class_option :infrastructure, :banner => "<infrastructure>", :desc => "Infrastructure hosting the vm", :default => 'vsphere'
     class_option :target, :banner=>"<target>", :desc => "Path for the final stemcell"
     class_option :agent_src_path, :banner => "<agent_src_path>", :desc => "Bosh Agent Source path"
-    class_option :agent_version, :banner => "<agent version>", :desc => "Bosh Agent Version"
-    class_option :bosh_protocol, :banner => "<bosh_protocol>", :desc => "Bosh Protocol Version"
+    class_option :agent_version, :banner => "<agent version>", :desc => "Bosh Agent Version", :default => Bosh::Agent::VERSION
+    class_option :bosh_protocol, :banner => "<bosh_protocol>", :desc => "Bosh Protocol Version", :default => Bosh::Agent::BOSH_PROTOCOL
 
     desc "ubuntu <name>", "Build a new ubuntu stemcell named <name>"
     def ubuntu(name)
@@ -35,10 +35,32 @@ module StemCellBuilderCLI
 
   end
 
+  class Info < Thor
+
+  end
+
   class StemCellBuilder < Thor
 
     desc "build SUBCOMMAND ...ARGS", "Build a new stemcell"
     subcommand "build", Build
+
+    desc "info <name>", "Display stemcell information, it looks for file <name>-<agent-version>.tar.gz"
+    option :file, :banner => "<file>", :desc => "path to the stemcell file, ignores the name"
+    def info(name)
+      if options[:file]
+        # use file
+        file_path = File.expand_path(options[:file])
+        unless File.exists? file_path
+          raise "File #{file_path} does not exist."
+        end
+        Kernel.system "tar -tvf #{file_path}"
+        Dir.mktmpdir {|dir|
+          if Kernel.system("tar -xzf #{file_path} stemcell.MF -C #{dir}")
+            puts File.open(File.join(dir, "stemcell.MF")).read()
+          end
+        }
+      end
+    end
 
   end
 

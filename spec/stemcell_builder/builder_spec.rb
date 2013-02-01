@@ -3,23 +3,55 @@ require 'spec_helper'
 describe Bosh::Agent::StemCell::BaseBuilder do
 
   before(:each) do
-    @stemcell = Bosh::Agent::StemCell::BaseBuilder.new({:type => "testing-stemcell"}, {})
+    @log = Logger.new(STDOUT)
+    @log.level = Logger::WARN
+    @stemcell = Bosh::Agent::StemCell::BaseBuilder.new({:type => "testing-stemcell", :logger => @log}, {})
   end
 
   it "Initializes the stemcell manifest with defaults" do
+    defaults = {
+        :name => 'bosh-stemcell',
+        :version => Bosh::Agent::VERSION,
+        :bosh_protocol => Bosh::Agent::BOSH_PROTOCOL,
+        :cloud_properties => {
+            :infrastructure => 'vsphere',
+            :architecture => 'x86_64'
+        }
+    }
+
+    @stemcell.manifest.should eq(defaults)
 
   end
 
   it "Initializes the stemcell manifest with defaults and deep_merges the provided args" do
+    manifest = {
+        :name => 'test-stemcell-name',
+        :version => Bosh::Agent::VERSION,
+        :bosh_protocol => Bosh::Agent::BOSH_PROTOCOL,
+        :cloud_properties => {
+            :infrastructure => 'vsphere',
+            :architecture => 'x86_64',
+            :key => 'value'
+        }
+    }
 
+    override_stemcell = Bosh::Agent::StemCell::BaseBuilder.new({:type => "testing-stemcell", :logger => @log}, {:name => 'test-stemcell-name',:cloud_properties => {:key => 'value'}})
+
+    override_stemcell.manifest.should eq(manifest)
   end
 
   it "Initializes the options with defaults" do
 
+    @stemcell.name.should eq "bosh-stemcell"
+    @stemcell.container.should eq "vbox"
+    @stemcell.infrastructure.should eq "vsphere"
+
   end
 
   it "Initializes the options with defaults and deep_merges the provided args" do
-
+    override_stemcell = Bosh::Agent::StemCell::BaseBuilder.new({:type => "testing-stemcell", :logger => @log}, {:name => 'test-stemcell-name',:cloud_properties => {:key => 'value'}})
+    override_stemcell.name.should eq "bosh-stemcell"
+    override_stemcell.type.should eq "testing-stemcell"
   end
 
   it "Should return an initialized stemcell builder" do
@@ -44,7 +76,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
 
   it "Should invoke the methods in the correct order (setup -> build_vm -> package_vm -> finalize)" do
 
-    @stemcell = Bosh::Agent::StemCell::NoOpBuilder.new
+    @stemcell = Bosh::Agent::StemCell::NoOpBuilder.new({:logger => @log}, {})
 
     @stemcell.run # all steps completed properly
 
