@@ -18,7 +18,7 @@ module Bosh::Agent::StemCell
 
       # Create the stemcell manifest
       File.open(stemcell_mf_path, "w") do |f|
-        f.write(generate_manifest().to_yaml)
+        f.write(@manifest.to_yaml)
       end
 
       files.push image_path, stemcell_mf_path
