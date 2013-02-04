@@ -9,7 +9,6 @@ require 'stemcell'
 module StemCellBuilderCLI
 
   class Build < Thor
-    class_option :container, :banner => "<container>", :desc => "Veewee container to use while building the stemcell", :default => 'vbox'
     class_option :prefix, :banner => "<prefix>", :desc => "Directory to use as staging area for all the stemcell work", :default => Dir.pwd
     class_option :architecture, :banner => "<architecture>", :desc => "Architecture of the OS", :default => 'x86_64'
     class_option :infrastructure, :banner => "<infrastructure>", :desc => "Infrastructure hosting the vm", :default => 'vsphere'

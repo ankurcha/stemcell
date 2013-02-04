@@ -46,7 +46,6 @@ describe Bosh::Agent::StemCell::BaseBuilder do
   it "Initializes the options with defaults" do
 
     @stemcell.name.should eq "bosh-stemcell"
-    @stemcell.container.should eq "vbox"
     @stemcell.infrastructure.should eq "vsphere"
 
   end
@@ -64,10 +63,10 @@ describe Bosh::Agent::StemCell::BaseBuilder do
 
   it "Build VM works properly" do
     # Expectations
-    Kernel.should_receive(:system).with("veewee #{@stemcell.container} build '#{@stemcell.name}' --force --nogui --auto").and_return(true)
-    Kernel.should_receive(:system).with("vagrant basebox export '#{@stemcell.name}'").and_return(true)
+    Kernel.should_receive(:system).with("veewee vbox build '#{@stemcell.name}' --force --nogui --auto").and_return(true)
+    Kernel.should_receive(:system).with("vagrant basebox export '#{@stemcell.name}' --force").and_return(true)
 
-    Kernel.should_receive(:system).with("veewee vbox destroy '#{@stemcell.name}'").and_return(true)
+    Kernel.should_receive(:system).with("veewee vbox destroy '#{@stemcell.name}' --force").and_return(true)
 
     @stemcell.build_vm
   end

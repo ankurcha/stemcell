@@ -46,12 +46,12 @@ module Bosh::Agent::StemCell
       end
 
       @logger.info "Export built VM #@name to #@prefix"
-      unless Kernel.system "vagrant basebox export '#@name'"
+      unless Kernel.system "vagrant basebox export '#@name' --force"
         raise "Unable to export VM #@name: vagrant basebox export '#@name'"
       end
 
       @logger.debug "Sending veewee destroy for #@name"
-      execute_veewee_cmd "destroy '#@name'"
+      execute_veewee_cmd "destroy '#@name' --force"
 
     end
 
@@ -94,13 +94,12 @@ module Bosh::Agent::StemCell
       return nil
     end
 
-    # Execute the provide veewee command with the correct container in @prefix and return the
-    # exit status
+    # Execute the provide veewee command and return the exit status
     #
     # @param [String] command Execute the specified veewee command in @prefix
     # @@return Exitstatus of the Kernel#system command
     def execute_veewee_cmd(command="")
-      cmd = "veewee #@container #{command}"
+      cmd = "veewee vbox #{command}"
       @logger.debug "Executing: #{cmd}"
       Kernel.system cmd
     end
@@ -116,7 +115,6 @@ module Bosh::Agent::StemCell
       merged_opts = opts.deep_merge({:name => 'bosh-stemcell',
                               :logger => Logger.new(STDOUT),
                               :target => nil,
-                              :container => 'vbox',
                               :infrastructure => 'vsphere',
                               :definitions_dir => definitions_dir,
                               :type => nil,
@@ -186,9 +184,8 @@ module Bosh::Agent::StemCell
 
     # Copies the veewee definition directory from ../definition/@type to @prefix/definitions/@name
     def copy_definitions
-      definition_src_path = File.join(@definitions_dir, @type)
-      @logger.info "TYPE: #@type"
-      @definition_dest_path = File.join('definitions', @name)
+      definition_src_path = File.expand_path(@type, @definitions_dir)
+      @definition_dest_path = File.expand_path(@name, "definitions")
 
       @logger.info "Copying definition from #{definition_src_path} to #@definition_dest_path"
 
