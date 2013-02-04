@@ -66,7 +66,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
     Kernel.should_receive(:system).with("veewee vbox build '#{@stemcell.name}' --force --nogui --auto").and_return(true)
     Kernel.should_receive(:system).with("vagrant basebox export '#{@stemcell.name}' --force").and_return(true)
 
-    Kernel.should_receive(:system).with("veewee vbox destroy '#{@stemcell.name}' --force").and_return(true)
+    Kernel.should_receive(:system).with("veewee vbox destroy '#{@stemcell.name}' --force --nogui").and_return(true)
 
     @stemcell.build_vm
   end
