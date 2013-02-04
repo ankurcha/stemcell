@@ -11,19 +11,19 @@ module Bosh::Agent::StemCell
 
     def build_vm
       @logger.info "Build VM invoked"
-      @counter+=1
+      @counter += 1
       @build_vm_run = @counter
     end
 
     def package_stemcell
       @logger.info "VM packaged into a stemcell"
-      @counter+=1
+      @counter += 1
       @package_stemcell_run = @counter
     end
 
     def setup
       @logger.info "Setting up stemcell creation process."
-      @counter+=1
+      @counter += 1
       @setup_run = @counter
     end
   end
