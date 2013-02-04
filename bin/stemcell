@@ -2,6 +2,8 @@
 #
 # Copyright (c) 2009-2012 VMware, Inc.
 
+$:.unshift File.join(__FILE__, "..", "..", "lib")
+
 require 'rubygems'
 require 'thor'
 require 'stemcell'
