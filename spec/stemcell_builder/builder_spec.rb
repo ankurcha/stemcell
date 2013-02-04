@@ -38,7 +38,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
         }
     }
 
-    override_stemcell = Bosh::Agent::StemCell::BaseBuilder.new({:type => "testing-stemcell", :logger => @log}, {:name => 'test-stemcell-name',:cloud_properties => {:key => 'value'}})
+    override_stemcell = Bosh::Agent::StemCell::BaseBuilder.new({:type => "ubuntu", :logger => @log}, {:name => 'test-stemcell-name',:cloud_properties => {:key => 'value'}})
 
     override_stemcell.manifest.should eq(manifest)
   end
@@ -51,9 +51,9 @@ describe Bosh::Agent::StemCell::BaseBuilder do
   end
 
   it "Initializes the options with defaults and deep_merges the provided args" do
-    override_stemcell = Bosh::Agent::StemCell::BaseBuilder.new({:type => "testing-stemcell", :logger => @log}, {:name => 'test-stemcell-name',:cloud_properties => {:key => 'value'}})
+    override_stemcell = Bosh::Agent::StemCell::BaseBuilder.new({:type => "ubuntu", :logger => @log}, {:name => 'test-stemcell-name',:cloud_properties => {:key => 'value'}})
     override_stemcell.name.should eq "bosh-stemcell"
-    override_stemcell.type.should eq "testing-stemcell"
+    override_stemcell.type.should eq "ubuntu"
   end
 
   it "Should return an initialized stemcell builder" do
