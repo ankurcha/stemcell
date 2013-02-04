@@ -51,7 +51,7 @@ module Bosh::Agent::StemCell
       end
 
       @logger.debug "Sending veewee destroy for #@name"
-      execute_veewee_cmd "destroy '#@name' --force"
+      execute_veewee_cmd "destroy '#@name' --force --nogui"
 
     end
 
