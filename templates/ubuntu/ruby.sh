@@ -5,7 +5,7 @@ source _variables.sh
 ### stage bosh_ruby
 # install ruby and rubygems
 if ! which ruby &> /dev/null; then
-	pushd /tmp		
+	pushd /tmp
     	[ ! -f "ruby-1.9.3-p374.tar.gz" ] && wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p374.tar.gz
     	tar zxf ruby-1.9.3-p374.tar.gz
     	cd ruby-1.9.3-p374

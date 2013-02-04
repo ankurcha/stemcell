@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 $:.unshift(File.join(File.dirname(__FILE__), 'lib'))
 
-require "builders/version"
+require "stemcell/version"
 
 Gem::Specification.new do |gem|
   gem.name                        = "stemcell"
@@ -29,6 +29,4 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "bundler"
   gem.add_development_dependency "rake"
   gem.add_development_dependency "rspec"
-
-  
 end
