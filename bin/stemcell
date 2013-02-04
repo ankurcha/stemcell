@@ -47,21 +47,17 @@ module StemCellBuilderCLI
     desc "build SUBCOMMAND ...ARGS", "Build a new stemcell"
     subcommand "build", Build
 
-    desc "info <name>", "Display stemcell information, it looks for file <name>-<agent-version>.tar.gz"
-    option :file, :banner => "<file>", :desc => "path to the stemcell file, ignores the name"
-    def info(name)
-      if options[:file]
-        # use file
-        file_path = File.expand_path(options[:file])
-        unless File.exists? file_path
-          raise "File #{file_path} does not exist."
+    desc "info <file>", "Display stemcell information, it looks for stemcell file name <file>"
+    def info(file)
+      raise "File #{file} does not exist." unless File.exists? file
+
+      Kernel.system "tar -tvf #{file}"
+
+      dir = Dir.mktmpdir
+      Dir.chdir(dir) do
+        if Kernel.system("tar -xzf #{file} stemcell.MF")
+          puts File.open("stemcell.MF").read()
         end
-        Kernel.system "tar -tvf #{file_path}"
-        Dir.mktmpdir {|dir|
-          if Kernel.system("tar -xzf #{file_path} stemcell.MF -C #{dir}")
-            puts File.open(File.join(dir, "stemcell.MF")).read()
-          end
-        }
       end
     end
 
