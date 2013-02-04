@@ -10,7 +10,7 @@ module Bosh::Agent::StemCell
     end
 
 
-    def package_stemcell(files=[])
+    def package_stemcell
       #code here
     end
 

@@ -55,18 +55,9 @@ module Bosh::Agent::StemCell
 
     end
 
-    # Packages the stemcell contents (defined as the array of file path argument),
-    # Subclasses can add more behavior and files to the files arguments.
-    #
-    # @param [Array] files List of file paths that need to be packaged
-    def package_stemcell(files=[])
-      unless files.empty?
-        files_str = files.join(" ")
-        @logger.info "Packaging #{files_str} to #@target"
-        unless Kernel.system("tar -cvf #@target #{files_str}")
-          raise "unable to package #{files_str} into a stemcell"
-        end
-      end
+    # Packages the stemcell contents (defined as the array of file path argument)
+    def package_stemcell
+      raise 'not implemented'
     end
 
     # Main execution method that sets up, builds the VM and packages the stemcell
@@ -104,6 +95,15 @@ module Bosh::Agent::StemCell
       Kernel.system cmd
     end
 
+    def package_files(*files)
+      unless files.empty?
+        files_str = files.join(" ")
+        @logger.info "Packaging #{files_str} to #@target"
+        unless Kernel.system("tar -cvf #@target #{files_str}")
+          raise "unable to package #{files_str} into a stemcell"
+        end
+      end
+    end
 
     private
     def initialize_instance_vars(opts={})
