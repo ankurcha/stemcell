@@ -10,7 +10,7 @@ CHROOT=/tmp/chroot
 ## Check if stemcell_base.tar.gz already exists
 [ -f $bosh_app_dir/stemcell_base.tar.gz ] && exit 0
 
-cd /tmp
+pushd /tmp
     ARCH=$(dpkg --print-architecture)
     debootstrap --make-tarball=debootstrap-squeeze-tarball.tar --arch=$ARCH  --include=$PACKAGES squeeze $CHROOT
     debootstrap --variant=minbase --unpack-tarball=/tmp/debootstrap-squeeze-tarball.tar squeeze $CHROOT
@@ -91,4 +91,4 @@ apt-get autoremove
     echo "Creating base stemcell archive at $bosh_app_dir/stemcell_base.tar.gz"
     tar -C $CHROOT -czf $bosh_app_dir/stemcell_base.tar.gz .
     chmod 0700 $bosh_app_dir/stemcell_base.tar.gz
-cd $HOME
+popd
