@@ -4,8 +4,10 @@ module Bosh::Agent::StemCell
 
     def package_stemcell
       # unbox the exported thing
-      unless system "tar -xzf #{File.expand_path("#@name.box", @prefix)}"
-        raise "Unable to unpack exported .box file"
+      Dir.chdir(@prefix) do
+        unless system "tar -xzf #{@name}.box"
+          raise "Unable to unpack exported .box file"
+        end
       end
 
       # tar up the vmdk, ovf files to 'image'
