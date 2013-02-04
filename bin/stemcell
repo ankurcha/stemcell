@@ -19,7 +19,7 @@ module StemCellBuilderCLI
     class_option :agent_version, :banner => "<agent version>", :desc => "Bosh Agent Version", :default => Bosh::Agent::VERSION
     class_option :bosh_protocol, :banner => "<bosh_protocol>", :desc => "Bosh Protocol Version", :default => Bosh::Agent::BOSH_PROTOCOL
     class_option :iso, :banner => "<iso file path>", :desc => "Path to the iso file to use"
-    class_option :iso_md5, :banner => "<iso file path>", :desc => "MD5 of the ISO"
+    class_option :iso_md5, :banner => "<MD5 of iso file>", :desc => "MD5 of the ISO"
 
     desc "ubuntu <name>", "Build a new ubuntu stemcell named <name>"
     def ubuntu(name)
