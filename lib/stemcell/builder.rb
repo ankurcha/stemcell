@@ -168,7 +168,7 @@ module Bosh::Agent::StemCell
     # Packages the agent into a bosh_agent gem and copies it over to @definition_dest_path
     # so that it can be used as a part of the VM building process by veewee (using the definition).
     def package_agent
-      @logger.debug "Packaging Bosh Agent to #@definition_dest_path/bosh_agent.gem"
+      @logger.debug "Packaging Bosh Agent to #@definition_dest_path/_bosh_agent.gem"
       if File.directory? @agent_src_path
         Dir.chdir(@agent_src_path) do
           unless Kernel.system("gem build bosh_agent.gemspec")
