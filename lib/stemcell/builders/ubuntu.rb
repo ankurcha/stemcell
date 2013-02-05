@@ -9,7 +9,7 @@ module Bosh::Agent::StemCell
   #   :iso_filename => 'ubuntu-11.04-server-amd64.iso'
   # }
   #
-  # The manifest is passed with the following additional valued
+  # The manifest is passed with the following additional merged values
   # {
   #   :cloud_properties => {
   #     :root_device_name => '/dev/sda1'
@@ -19,16 +19,19 @@ module Bosh::Agent::StemCell
 
     def package_stemcell
       # unbox the exported thing
+      image_path = File.expand_path "image", @prefix
+
       Dir.chdir(@prefix) do
+
         unless system "tar -xzf #@name.box"
           raise "Unable to unpack exported .box file"
         end
-      end
 
-      # tar up the vmdk, ovf files to 'image'
-      image_path = File.expand_path "image", @prefix
-      unless system "tar -cvf #{image_path} *.vmdk *.ovf"
-        raise "Unable to create image tar from ovf and vmdk"
+        # tar up the vmdk, ovf files to 'image'
+        unless system "tar -czf #{image_path} *.vmdk *.ovf"
+          raise "Unable to create image tar from ovf and vmdk"
+        end
+
       end
 
       # Create the stemcell manifest
@@ -38,12 +41,12 @@ module Bosh::Agent::StemCell
       end
 
       # TODO: deal with package list
-      legal_package_list = File.expand_path "stemcell_dpkg_l.txt"
+      legal_package_list = File.expand_path "stemcell_dpkg_l.txt", @prefix
 
       package_files image_path, stemcell_mf_path
     end
 
-    def initialize(opts={}, manifest={:cloud_properties => {:root_device_name => '/dev/sda1'}})
+    def initialize(opts={}, manifest={})
       super(
           opts.deep_merge(
               {
@@ -51,7 +54,13 @@ module Bosh::Agent::StemCell
                   :iso => 'http://releases.ubuntu.com/11.04/ubuntu-11.04-server-amd64.iso',
                   :iso_filename => 'ubuntu-11.04-server-amd64.iso', :iso_md5 => '355ca2417522cb4a77e0295bf45c5cd5'
               }),
-          manifest)
+          manifest.deep_merge(
+              {
+                  :cloud_properties => {
+                      :root_device_name => '/dev/sda1'
+                  }
+              }
+          ))
     end
 
   end

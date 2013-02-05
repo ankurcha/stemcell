@@ -53,7 +53,7 @@ module Bosh::Agent::StemCell
       initialize_manifest(manifest)
 
       # Initialize target
-      @target ||= "bosh-#@type-#@agent_version.tgz"
+      @target ||= File.expand_path("bosh-#@type-#@agent_version.tgz")
       @logger.info "Using target file: #@target"
 
       if File.exists? @target
@@ -141,9 +141,15 @@ module Bosh::Agent::StemCell
       unless files.empty?
         files_str = files.join(" ")
         @logger.info "Packaging #{files_str} to #@target"
-        unless Kernel.system("tar -cvf #@target #{files_str}")
-          raise "unable to package #{files_str} into a stemcell"
-        end
+        Dir.mktmpdir{|tmpdir|
+          # copy files
+          FileUtils.cp files, tmpdir
+          Dir.chdir(tmpdir) {
+            unless Kernel.system("tar -czf #{@target} * -C #{tmpdir}")
+              raise "unable to package #{files_str} into a stemcell"
+            end
+          }
+        }
       end
     end
 
