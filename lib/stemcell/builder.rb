@@ -11,10 +11,43 @@ module Bosh::Agent::StemCell
     @source_root ||= Pathname.new(File.expand_path('../../', __FILE__))
   end
 
+  # This BaseBuilder abstract class represents the base stemcell builder and should be extended by specific stemcell
+  # builders for different distributions
   class BaseBuilder
 
     attr_accessor :manifest
 
+    # Stemcell builders are initialized with a manifest and a set of options. The options provided are merged with the
+    # defaults to allow the end user/developer to specify only the ones that they wish to change and fallback to the defaults.
+    #
+    # The stemcell builder options are as follows
+    #{
+    #  :name => 'bosh-stemcell', # Name of the output stemcell
+    #  :logger => Logger.new(STDOUT), # The logger instance to use
+    #  :target => "bosh-#@type-#@agent_version.tgz", # Target file to generate, by default it will the ./bosh-#@type-#@agent_version.tgz
+    #  :infrastructure => 'vsphere', # The target infrastructure, this can be aws||vsphere||openstack
+    #  :definitions_dir => definitions_dir, # The directory where the definitions are stored
+    #  :type => nil,  # The type of the stemcell ubuntu||redhat
+    #  :agent_src_path => './bosh_agent-0.7.0.gem', # The path to the stemcell gem to be installed
+    #  :agent_version => '0.7.0', # Agent version
+    #  :bosh_protocol => '1', # Bosh protocol version
+    #  :architecture => 'x86_64', # The target system architecture
+    #  :prefix => `pwd`, # Directory to use as the staging area and where the stemcell will be generated
+    #  :iso => nil, # The url from where the builder can download the stemcell
+    #  :iso_md5 => nil, # The MD5 hash of the iso
+    #  :iso_filename => nil # Optional iso filename to use/search for in the iso folder
+    #}
+    #
+    # The stemcell manifest is as follows
+    #{
+    # :name => @name, # the bosh stemcell name given as a part of the options[:name]
+    # :version => @agent_version, # The agent version
+    # :bosh_protocol => @bosh_protocol,
+    # :cloud_properties => {
+    #    :infrastructure => @infrastructure,
+    #    :architecture => @architecture
+    #  }
+    #}
     def initialize(opts={}, manifest={})
       initialize_instance_vars(opts)
       initialize_manifest(manifest)
@@ -31,7 +64,7 @@ module Bosh::Agent::StemCell
       # Initialize definition path
       @definition_src_path = File.join(@definitions_dir, @type)
       unless Dir.exist? @definition_src_path
-        raise "Definition for '#{@type}' does not exist at path '#{@definition_src_path}'"
+	raise "Definition for '#@type' does not exist at path '#@definition_src_path'"
       end
 
       @definition_dest_path = File.join(@prefix, "definitions", @name)
@@ -45,7 +78,8 @@ module Bosh::Agent::StemCell
       package_agent
     end
 
-    # This method creates the vm using the name as the vm name
+    # This method creates the vm using the #@name as the virtual machine name
+    # If an existing VM exists with the same name, it will be deleted.
     def build_vm
       Dir.chdir(@prefix) do
         @logger.info "Building vm #@name"
@@ -69,7 +103,7 @@ module Bosh::Agent::StemCell
       raise 'not implemented'
     end
 
-    # Main execution method that sets up, builds the VM and packages the stemcell
+    # Main execution method that sets up the directory, builds the VM and packages everything into a stemcell
     def run
       setup
       build_vm
@@ -102,6 +136,7 @@ module Bosh::Agent::StemCell
       Kernel.system cmd
     end
 
+    # Package all files specified as arguments into a tar. The output file is specified by the :target option
     def package_files(*files)
       unless files.empty?
         files_str = files.join(" ")
@@ -113,6 +148,8 @@ module Bosh::Agent::StemCell
     end
 
     private
+
+    # Initialize all the options passed to the builder as instance variables after merging with the default values.
     def initialize_instance_vars(opts={})
       # merge options and defaults and initialize instance variables
       agent_version = Bosh::Agent::VERSION
@@ -163,7 +200,8 @@ module Bosh::Agent::StemCell
       end
     end
 
-    # This method creates the stemcell manifest
+    # Merges the given manifest with the default values and assign it to the @manifest instance variable which is later
+    # used to generate the stemcell.MF ( the stemcell manifest) that is put in the generated stemcell archive.
     def initialize_manifest(manifest={})
       # perform a deep_merge of the provided manifest with the defaults
       @manifest = manifest.deep_merge(
@@ -196,11 +234,11 @@ module Bosh::Agent::StemCell
       end
     end
 
-    # Copies the veewee definition directory from ../definition/@type to @prefix/definitions/@name
+    # Copies the veewee definition directory from ../templates/#@type to #@prefix/definitions/#@name
     def copy_definitions
-      @logger.info "Copying definition from #{@definition_src_path} to #@definition_dest_path"
+      @logger.info "Copying definition from #@definition_src_path to #@definition_dest_path"
 
-      FileUtils.cp_r Dir.glob("#{@definition_src_path}/*"), @definition_dest_path
+      FileUtils.cp_r Dir.glob("#@definition_src_path/*"), @definition_dest_path
 
       # Compile erb files
       Dir.glob(File.join(@definition_dest_path, '*.erb')) { |erb_file|

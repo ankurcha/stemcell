@@ -8,10 +8,10 @@ Gem::Specification.new do |gem|
   gem.version                     = Bosh::Agent::StemCell::VERSION
   gem.authors                     = ["Ankur Chauhan"]
   gem.email                       = %w(ankurc@vmware.com)
-  gem.description                 = "Write a description"
-  gem.summary                     = "Write a summary"
+  gem.description                 = "Stemcell builder for Bosh"
+  gem.summary                     = "A commandline utility for creating stemcells for Bosh"
   gem.homepage                    = "http://www.github.com/cloudfoundry/bosh"
-  gem.license                     = 'Apache 2.0'
+  gem.license                     = 'MIT'
 
   gem.files                       = `git ls-files`.split($/)
   gem.executables                 = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
