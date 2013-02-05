@@ -45,6 +45,11 @@ module StemCellBuilderCLI
       Bosh::Agent::StemCell::RedhatBuilder.new(options.merge({:name => name}).reject { |k, v| v.nil? }, {}).run
     end
 
+    desc "centos <name>", "Build a new redhat stemcell named <name>"
+    def centos(name)
+      Bosh::Agent::StemCell::CentosBuilder.new(options.merge({:name => name}).reject { |k, v| v.nil? }, {}).run
+    end
+
     desc "noop <name>", "Build a new noop stemcell named <name> [this is good for testing only]"
     def noop(name)
       Bosh::Agent::StemCell::NoOpBuilder.new(options.merge({:name => name}).reject { |k, v| v.nil? }, {}).run

@@ -265,3 +265,4 @@ end
 require 'stemcell/builders/noop'
 require 'stemcell/builders/ubuntu'
 require 'stemcell/builders/redhat'
+require 'stemcell/builders/centos'

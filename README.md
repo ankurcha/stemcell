@@ -1,6 +1,6 @@
 # Builder
 
-TODO: Write a gem description
+The stemcell builder is a commandline tool to create new stemcells
 
 ## Installation
 
@@ -18,8 +18,6 @@ Or install it yourself as:
 
 ## Usage
 
-The stemcell builder is a commandline tool to create new stemcells
-
 The following is a listing of commands
 
     stemcell build SUBCOMMAND ...ARGS  # Build a new stemcell
@@ -33,6 +31,7 @@ Tasks:
    stemcell build noop <name>     # Build a new noop stemcell named <name> [this is good for testing only]
    stemcell build redhat <name>   # Build a new redhat stemcell named <name>
    stemcell build ubuntu <name>   # Build a new ubuntu stemcell named <name>
+   stemcell build centos <name>   # Build a new centos stemcell named <name>
 
 Options:
    [--prefix=<prefix>]                  # Directory to use as staging area for all the stemcell work
