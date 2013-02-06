@@ -2,8 +2,9 @@
 set -x
 
 source _helpers.sh
+source _variables.sh
 
-PACKAGES="build-essential,libssl-dev,lsof,strace,bind9-host,dnsutils,tcpdump,iputils-arping,curl,wget,libcurl3,bison,libreadline6-dev,libxml2,libxml2-dev,libxslt1.1,libxslt1-dev,zip,unzip,nfs-common,flex,psmisc,iptables,sysstat,rsync,openssh-server,libncurses5-dev,quota,libaio1,gdb,psmisc,dialog"
+PACKAGES="build-essential,libssl-dev,lsof,strace,bind9-host,dnsutils,iputils-arping,curl,wget,libcurl3,bison,libreadline6-dev,libxml2,libxml2-dev,libxslt1.1,libxslt1-dev,zip,unzip,nfs-common,flex,psmisc,iptables,sysstat,rsync,openssh-server,libncurses5-dev,quota,libaio1,psmisc,dialog"
 CHROOT=/tmp/chroot
 [ -d $CHROOT ] && rm -rf $CHROOT && mkdir -p $CHROOT
 
