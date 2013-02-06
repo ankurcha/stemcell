@@ -21,7 +21,6 @@ describe Bosh::Agent::StemCell::UbuntuBuilder do
                                      :cloud_properties => {
                                          :infrastructure => 'vsphere',
                                          :architecture => 'x86_64',
-                                         :root_device_name => '/dev/sda1'
                                      }
                                  })
   end
