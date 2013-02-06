@@ -6,7 +6,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
     @log = Logger.new(STDOUT)
     @log.level = Logger::DEBUG
     @prefix_dir = Dir.mktmpdir
-    @agent_file = File.join(@prefix_dir, "bosh_agent-0.7.0.gem")
+    @agent_file = File.join(@prefix_dir, "bosh_agent-#{Bosh::Agent::VERSION}.gem")
     FileUtils.touch @agent_file
     @stemcell = Bosh::Agent::StemCell::BaseBuilder.new({:logger => @log, :prefix => @prefix_dir, :agent_src_path => @agent_file}, {})
   end
