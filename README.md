@@ -1,4 +1,4 @@
-# Builder [![Build Status](https://travis-ci.org/ankurcha/stemcell.png?branch=master)](https://travis-ci.org/ankurcha/stemcell)
+# Builder [![Build Status](https://travis-ci.org/ankurcha/stemcell.png?branch=master)](https://travis-ci.org/ankurcha/stemcell) [![Code Climate](https://codeclimate.com/github/ankurcha/stemcell.png)](https://codeclimate.com/github/ankurcha/stemcell)
 
 The stemcell builder is a commandline tool to create new stemcells
 
