@@ -217,6 +217,11 @@ module Bosh::Agent::StemCell
         FileUtils.mv @target, "#@target.bak"
       end
 
+      @logger.info "Checking agent source: #{@agent_src_path}"
+      unless File.exists? @agent_src_path
+        raise "Agent source #{@agent_src_path} doens't exist"
+      end
+
       @logger.info "Checking definitions dir..."
       unless Dir.exist? definition_dir
         raise "Definition for '#{type}' does not exist at path '#{definition_dir}'"
