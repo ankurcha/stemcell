@@ -14,11 +14,11 @@ module StemCellBuilderCLI
     class_option :name,           :banner => "<name>",
                                   :desc => "Name of the stemcell"
     class_option :prefix,         :banner => "<prefix>",
-                                  :desc => "Directory to use as staging area for all the stemcell work",
+                                  :desc => "Directory to use as staging area for all the stemcell work"
     class_option :architecture,   :banner => "<architecture>",
-                                  :desc => "Architecture of the OS",
+                                  :desc => "Architecture of the OS"
     class_option :infrastructure, :banner => "<infrastructure>",
-                                  :desc => "Infrastructure hosting the vm",
+                                  :desc => "Infrastructure hosting the vm"
     class_option :target,         :banner => "<target>",
                                   :desc => "Path for the final stemcell"
     class_option :agent_src_path, :banner => "<agent_src_path>",
@@ -30,22 +30,22 @@ module StemCellBuilderCLI
 
     desc "ubuntu", "Build a new ubuntu stemcell"
     def ubuntu
-      Bosh::Agent::StemCell::UbuntuBuilder.new(options).run
+      Bosh::Agent::StemCell::UbuntuBuilder.new(options.dup).run
     end
 
     desc "redhat", "Build a new redhat stemcell"
     def redhat
-      Bosh::Agent::StemCell::RedhatBuilder.new(options).run
+      Bosh::Agent::StemCell::RedhatBuilder.new(options.dup).run
     end
 
     desc "centos", "Build a new redhat stemcell"
     def centos
-      Bosh::Agent::StemCell::CentosBuilder.new(options).run
+      Bosh::Agent::StemCell::CentosBuilder.new(options.dup).run
     end
 
     desc "noop", "Build a new noop stemcell [this is good for testing only]"
     def noop
-      Bosh::Agent::StemCell::NoOpBuilder.new(options).run
+      Bosh::Agent::StemCell::NoOpBuilder.new(options.dup).run
     end
 
   end
