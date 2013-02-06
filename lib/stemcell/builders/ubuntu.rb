@@ -17,21 +17,6 @@ module Bosh::Agent::StemCell
   # }
   class UbuntuBuilder < BaseBuilder
 
-    def generate_image
-      # FIXME: This should be common for all the vmdk based builder
-      #        Refactor me later!
-
-      Dir.chdir(@prefix) do
-        unless system "tar -xzf #{@name}.box"
-          raise "Unable to unpack .box file"
-        end
-
-        unless system "tar -czf image *.vmdk *.ovf"
-          raise "Unable to create image file from ovf and vmdk"
-        end
-      end
-    end
-
     def initialize(opts={}, manifest={})
       super(
           opts.deep_merge(

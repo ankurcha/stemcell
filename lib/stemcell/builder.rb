@@ -115,7 +115,15 @@ module Bosh::Agent::StemCell
     end
 
     def generate_image
-      FileUtils.touch File.join(@prefix, "image")
+      Dir.chdir(@prefix) do
+        unless system "tar -xzf #{@name}.box"
+          raise "Unable to unpack .box file"
+        end
+
+        unless system "tar -czf image *.vmdk *.ovf"
+          raise "Unable to create image file from ovf and vmdk"
+        end
+      end
     end
 
     def generate_pkg_list
