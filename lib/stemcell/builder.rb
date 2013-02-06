@@ -90,6 +90,10 @@ module Bosh::Agent::StemCell
       "noop"
     end
 
+    def init_default_iso
+      # FIXME: raise "not implemented"
+    end
+
     # Packages the stemcell contents (defined as the array of file path argument)
     def package_stemcell
       generate_image
@@ -187,7 +191,9 @@ module Bosh::Agent::StemCell
         unless @iso_md5
           raise "MD5 must be specified is ISO is specified"
         end
-        @iso_filename = File.basename @iso
+        @iso_filename ||= File.basename @iso
+      else
+        init_default_iso
       end
     end
 
