@@ -211,15 +211,15 @@ module Bosh::Agent::StemCell
     def sanity_check
       @logger.info "Sanity check"
 
-      @logger.info "Checking target file: #{@target}..."
+      @logger.info "Checking target file: #@target..."
       if File.exists? @target
         @logger.warn "Target file #@target exists. Moving old file to #@target.bak."
         FileUtils.mv @target, "#@target.bak"
       end
 
-      @logger.info "Checking agent source: #{@agent_src_path}"
+      @logger.info "Checking agent source: #@agent_src_path"
       unless File.exists? @agent_src_path
-        raise "Agent source #{@agent_src_path} doens't exist"
+        raise "Agent source #@agent_src_path doens't exist"
       end
 
       @logger.info "Checking definitions dir..."
