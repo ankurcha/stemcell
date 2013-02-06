@@ -10,7 +10,7 @@ pushd /tmp
     [ ! -f "ruby-1.9.3-p374.tar.gz" ] && wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p374.tar.gz
 	tar zxf ruby-1.9.3-p374.tar.gz
 	cd ruby-1.9.3-p374
-	./configure --prefix=$bosh_dir --disable-install-doc && make && make install
+	./configure --prefix=$bosh_dir --disable-install-doc --enable-pthread --enable-shared && make && make install
 
 	# Install rubygems
 	cd ..
@@ -20,7 +20,7 @@ pushd /tmp
 	$bosh_dir/bin/ruby setup.rb --no-format-executable
 popd
 
-echo "PATH=$PATH:$bosh_dir/bin" > /etc/environment
+echo "PATH=$bosh_dir/bin:$PATH" > /etc/environment
 source /etc/environment
 
 $bosh_dir/bin/gem update --system --no-ri --no-rdoc
