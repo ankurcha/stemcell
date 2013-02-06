@@ -86,12 +86,11 @@ module Bosh::Agent::StemCell
     end
 
     def type
-      # FIXME: raise "not implemented"
-      "noop"
+      raise "Type must be initialized"
     end
 
     def init_default_iso
-      # FIXME: raise "not implemented"
+      raise "Default ISO options must be provided"
     end
 
     # Packages the stemcell contents (defined as the array of file path argument)
@@ -171,7 +170,7 @@ module Bosh::Agent::StemCell
       end
     end
 
-    private
+private
 
     # Initialize all the options passed to the builder as instance variables after merging with the default values.
     def initialize_instance_vars(opts)

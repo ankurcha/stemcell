@@ -2,13 +2,42 @@ require 'spec_helper'
 
 describe Bosh::Agent::StemCell::BaseBuilder do
 
+  class TestBuilder < Bosh::Agent::StemCell::BaseBuilder
+    def type
+      "noop"
+    end
+    def init_default_iso
+      # Do nothing
+    end
+  end
+
   before(:each) do
-    @log = Logger.new(STDOUT)
-    @log.level = Logger::DEBUG
     @prefix_dir = Dir.mktmpdir
     @agent_file = File.join(@prefix_dir, "bosh_agent-#{Bosh::Agent::VERSION}.gem")
     FileUtils.touch @agent_file
-    @stemcell = Bosh::Agent::StemCell::BaseBuilder.new({:logger => @log, :prefix => @prefix_dir, :agent_src_path => @agent_file}, {})
+    @stemcell = TestBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file}, {})
+  end
+
+  after(:each) do
+    target = File.expand_path(@stemcell.target)
+    if File.exists?(target)
+      FileUtils.rm_f target
+      FileUtils.rm_f "#{target}.bak"
+    end
+  end
+
+
+  it "Should initialize all default ISOs parameters properly" do
+    @stemcell.iso.should be_nil
+    @stemcell.iso_filename.should be_nil
+    @stemcell.iso_md5.should be_nil
+  end
+
+  it "Should initialize all override ISOs properly" do
+    @stemcell = TestBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file, :iso => "http://example.com/example.iso", :iso_md5 => "example-md5", :iso_filename => "example.iso"}, {})
+    @stemcell.iso.should eq "http://example.com/example.iso"
+    @stemcell.iso_md5.should eq "example-md5"
+    @stemcell.iso_filename.should eq "example.iso"
   end
 
   it "Initializes the stemcell manifest with defaults" do
@@ -38,7 +67,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
         }
     }
 
-    override_stemcell = Bosh::Agent::StemCell::BaseBuilder.new({:logger => @log, :prefix => @prefix_dir, :agent_src_path => @agent_file}, {:name => 'test-stemcell-name',:cloud_properties => {:key => 'value'}})
+    override_stemcell = TestBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file}, {:name => 'test-stemcell-name',:cloud_properties => {:key => 'value'}})
 
     override_stemcell.manifest.should eq(manifest)
   end
@@ -51,7 +80,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
   end
 
   it "Initializes the options with defaults and deep_merges the provided args" do
-    override_stemcell = Bosh::Agent::StemCell::BaseBuilder.new({:logger => @log, :prefix => @prefix_dir, :agent_src_path => @agent_file}, {:name => 'test-stemcell-name',:cloud_properties => {:key => 'value'}})
+    override_stemcell = TestBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file}, {:name => 'test-stemcell-name',:cloud_properties => {:key => 'value'}})
     override_stemcell.name.should eq "bosh-stemcell"
     override_stemcell.type.should eq "noop"
   end
@@ -90,13 +119,35 @@ describe Bosh::Agent::StemCell::BaseBuilder do
 
   it "Should invoke the methods in the correct order (setup -> build_vm -> package_vm -> finalize)" do
 
-    @stemcell = Bosh::Agent::StemCell::NoOpBuilder.new({:logger => @log, :prefix => @prefix_dir, :agent_src_path => @agent_file}, {})
+    @stemcell = Bosh::Agent::StemCell::NoOpBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file}, {})
 
     @stemcell.run # all steps completed properly
 
     @stemcell.setup_run.should eq 1
     @stemcell.build_vm_run.should eq 2
     @stemcell.package_stemcell_run.should eq 3
+  end
+
+  it "Packages the stemcell contents correctly" do
+    require 'yaml'
+
+    Dir.chdir(@prefix_dir) {
+      # Create the box file
+      FileUtils.touch "box-disk1.vmdk"
+      FileUtils.touch "box.ovf"
+      FileUtils.touch "Vagrantfile" # Unused
+      system "tar -czf #{@stemcell.name}.box box-disk1.vmdk box.ovf Vagrantfile"
+    }
+
+    @stemcell.package_stemcell()
+    target = File.expand_path(@stemcell.target)
+
+    File.exists?(target).should eq true # target is created
+
+    Dir.mktmpdir { |tmpdir|
+      system "tar -C #{tmpdir} -xzf #{target} stemcell.MF"
+      YAML.load_file(File.expand_path("stemcell.MF", tmpdir)).should eq @stemcell.manifest
+    }
   end
 
 end

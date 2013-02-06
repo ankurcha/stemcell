@@ -30,6 +30,11 @@ module Bosh::Agent::StemCell
       @counter += 1
       @setup_run = @counter
     end
+
+    def init_default_iso
+
+    end
+
   end
 
 end
