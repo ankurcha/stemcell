@@ -8,7 +8,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
     @prefix_dir = Dir.mktmpdir
     @agent_file = File.join(@prefix_dir, "bosh-agent.gem")
     FileUtils.touch @agent_file
-    @stemcell = Bosh::Agent::StemCell::BaseBuilder.new({:type => "noop", :logger => @log, :prefix => @prefix_dir, :agent_src_path => @agent_file}, {})
+    @stemcell = Bosh::Agent::StemCell::BaseBuilder.new({:logger => @log, :prefix => @prefix_dir, :agent_src_path => @agent_file}, {})
   end
 
   it "Initializes the stemcell manifest with defaults" do
@@ -38,7 +38,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
         }
     }
 
-    override_stemcell = Bosh::Agent::StemCell::BaseBuilder.new({:type => "ubuntu", :logger => @log}, {:name => 'test-stemcell-name',:cloud_properties => {:key => 'value'}})
+    override_stemcell = Bosh::Agent::StemCell::UbuntuBuilder.new({:logger => @log}, {:name => 'test-stemcell-name',:cloud_properties => {:key => 'value'}})
 
     override_stemcell.manifest.should eq(manifest)
   end
@@ -51,7 +51,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
   end
 
   it "Initializes the options with defaults and deep_merges the provided args" do
-    override_stemcell = Bosh::Agent::StemCell::BaseBuilder.new({:type => "ubuntu", :logger => @log}, {:name => 'test-stemcell-name',:cloud_properties => {:key => 'value'}})
+    override_stemcell = Bosh::Agent::StemCell::UbuntuBuilder.new({:logger => @log}, {:name => 'test-stemcell-name',:cloud_properties => {:key => 'value'}})
     override_stemcell.name.should eq "bosh-stemcell"
     override_stemcell.type.should eq "ubuntu"
   end

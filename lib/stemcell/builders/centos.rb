@@ -17,21 +17,17 @@ module Bosh::Agent::StemCell
   # }
   class CentosBuilder < BaseBuilder
 
+    def type
+      "centos"
+    end
+
     def initialize(opts={}, manifest={})
-      super(
-          opts.deep_merge(
-              {
-                  :type => 'centos',
-                  :iso => 'http://www.mirrorservice.org/sites/mirror.centos.org/6.3/isos/x86_64/CentOS-6.3-x86_64-minimal.iso',
-                  :iso_filename => 'CentOS-6.3-x86_64-minimal.iso', :iso_md5 => '087713752fa88c03a5e8471c661ad1a2'
-              }),
-          manifest.deep_merge(
-              {
-                  :cloud_properties => {
-                      :root_device_name => '/dev/sda1'
-                  }
-              }
-          ))
+      opts.deep_merge!(
+        {
+            :iso => 'http://www.mirrorservice.org/sites/mirror.centos.org/6.3/isos/x86_64/CentOS-6.3-x86_64-minimal.iso',
+            :iso_filename => 'CentOS-6.3-x86_64-minimal.iso', :iso_md5 => '087713752fa88c03a5e8471c661ad1a2'
+        })
+      super(opts, manifest)
     end
 
   end
