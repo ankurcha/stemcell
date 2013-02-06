@@ -17,21 +17,18 @@ module Bosh::Agent::StemCell
   # }
   class UbuntuBuilder < BaseBuilder
 
+    def type
+      "ubuntu"
+    end
+
     def initialize(opts={}, manifest={})
-      super(
-          opts.deep_merge(
-              {
-                  :type => 'ubuntu',
-                  :iso => 'http://releases.ubuntu.com/11.04/ubuntu-11.04-server-amd64.iso',
-                  :iso_filename => 'ubuntu-11.04-server-amd64.iso', :iso_md5 => '355ca2417522cb4a77e0295bf45c5cd5'
-              }),
-          manifest.deep_merge(
-              {
-                  :cloud_properties => {
-                      :root_device_name => '/dev/sda1'
-                  }
-              }
-          ))
+      opts.deep_merge!(
+        {
+          :iso => 'http://releases.ubuntu.com/11.04/ubuntu-11.04-server-amd64.iso',
+          :iso_filename => 'ubuntu-11.04-server-amd64.iso', :iso_md5 => '355ca2417522cb4a77e0295bf45c5cd5'
+        })
+
+      super(opts, manifest)
     end
 
   end

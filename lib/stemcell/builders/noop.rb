@@ -4,9 +4,13 @@ module Bosh::Agent::StemCell
 
     attr_reader :build_vm_run, :package_stemcell_run, :setup_run
 
+    def type
+      "noop"
+    end
+
     def initialize(opts={}, manifest={})
       @counter = 0
-      super(opts.merge({:type => "noop"}), manifest)
+      super(opts, manifest)
     end
 
     def build_vm
