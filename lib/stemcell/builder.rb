@@ -167,7 +167,7 @@ module Bosh::Agent::StemCell
         Dir.mktmpdir{|tmpdir|
           
           # copy files
-          FileUtils.cp files, tmpdir
+          files.each {|file| FileUtils.cp file, tmpdir }
 
           Dir.chdir(tmpdir) {
             unless Kernel.system("tar -czf #{@target} * -C #{tmpdir}")

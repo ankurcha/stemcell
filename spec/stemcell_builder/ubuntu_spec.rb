@@ -44,7 +44,7 @@ describe Bosh::Agent::StemCell::UbuntuBuilder do
       system "tar -czf #{@stemcell.name}.box box-disk1.vmdk box.ovf Vagrantfile"
     }
 
-    @stemcell.package_stemcell
+    @stemcell.package_stemcell()
     target = File.expand_path(@stemcell.target)
 
     File.exists?(target).should eq true # target is created
