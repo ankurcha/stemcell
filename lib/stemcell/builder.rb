@@ -99,31 +99,27 @@ module Bosh::Agent::StemCell
     end
 
     # Packages the stemcell contents (defined as the array of file path argument)
-    def package_stemcell(*files)
-      # unbox the exported thing
-      image_path = File.expand_path "image", @prefix
+    def package_stemcell
+      generate_image
+      generate_manifest
+      generate_pkg_list
 
-      Dir.chdir(@prefix) do
+      package_files "image", "stemcell.MF", "stemcell_dpkg_l.txt"
+    end
 
-        unless system "tar -xzf #@name.box"
-          raise "Unable to unpack exported .box file"
-        end
-
-        # tar up the vmdk, ovf files to 'image'
-        unless system "tar -czf #{image_path} *.vmdk *.ovf"
-          raise "Unable to create image tar from ovf and vmdk"
-        end
-
-      end
-
-      # Create the stemcell manifest
+    def generate_manifest
       stemcell_mf_path = File.expand_path "stemcell.MF", @prefix
       File.open(stemcell_mf_path, "w") do |f|
         f.write(@manifest.to_yaml)
       end
-      
-      files.push image_path, stemcell_mf_path
-      package_files(files)
+    end
+
+    def generate_image
+      FileUtils.touch File.join(@prefix, "image")
+    end
+
+    def generate_pkg_list
+      FileUtils.touch File.join(@prefix, "stemcell_dpkg_l.txt")
     end
 
     # Main execution method that sets up the directory, builds the VM and packages everything into a stemcell
@@ -161,21 +157,13 @@ module Bosh::Agent::StemCell
 
     # Package all files specified as arguments into a tar. The output file is specified by the :target option
     def package_files(*files)
-      unless files.empty?
-        files_str = files.join(" ")
-        @logger.info "Packaging #{files_str} to #@target"
-        Dir.mktmpdir{|tmpdir|
-          
-          # copy files
-          files.each {|file| FileUtils.cp file, tmpdir }
+      files_str = files.join(" ")
+      @logger.info "Packaging #{files_str} to #{@target}"
 
-          Dir.chdir(tmpdir) {
-            unless Kernel.system("tar -czf #{@target} * -C #{tmpdir}")
-              raise "unable to package #{files_str} into a stemcell"
-            end
-          }
-          
-        }
+      Dir.chdir(@prefix) do
+        unless system "tar -czf #{@target} #{files_str}"
+          raise "unable to package #{files_str} into a stemcell"
+        end
       end
     end
 
