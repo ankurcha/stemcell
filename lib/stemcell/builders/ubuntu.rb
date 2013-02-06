@@ -21,14 +21,10 @@ module Bosh::Agent::StemCell
       "ubuntu"
     end
 
-    def initialize(opts={}, manifest={})
-      opts.deep_merge!(
-        {
-          :iso => 'http://releases.ubuntu.com/11.04/ubuntu-11.04-server-amd64.iso',
-          :iso_filename => 'ubuntu-11.04-server-amd64.iso', :iso_md5 => '355ca2417522cb4a77e0295bf45c5cd5'
-        })
-
-      super(opts, manifest)
+    def init_default_iso
+      @iso = "http://releases.ubuntu.com/11.04/ubuntu-11.04-server-amd64.iso"
+      @iso_md5 = "355ca2417522cb4a77e0295bf45c5cd5"
+      @iso_filename = "ubuntu-11.04-server-amd64.iso"
     end
 
   end
