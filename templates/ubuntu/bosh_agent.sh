@@ -4,7 +4,7 @@ source _variables.sh
 
 pushd $bosh_dir
 
-    $bosh_dir/bin/bundle install $HOME/_bosh_agent.gem
+    $bosh_dir/bin/bundle install $SRC_DIR/_bosh_agent.gem
     chmod +x $bosh_dir/agent/bin/agent
 
     # configure bosh agent
@@ -24,7 +24,7 @@ pushd $bosh_dir
 
     ln -s /etc/sv/agent /etc/service/agent
 
-    cp $HOME/_empty_state.yml $bosh_dir/state.yml
+    cp $SRC_DIR/_empty_state.yml $bosh_dir/state.yml
 
     # The bosh agent installs a config that rotates on size
     mv /etc/cron.daily/logrotate /etc/cron.hourly/logrotate

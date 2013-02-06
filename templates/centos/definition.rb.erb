@@ -8,7 +8,7 @@ Veewee::Session.declare({
   :iso_file => "<%= @iso_filename %>",
   :iso_src => "<%= @iso %>",
   :iso_md5 => "<%= @iso_md5 %>",
-  :iso_download_timeout => 1000,
+  :iso_download_timeout => 5000,
   :boot_wait => "5",
   :boot_cmd_sequence => [
     '<Tab> text ks=http://%IP%:%PORT%/ks.cfg<Enter>'

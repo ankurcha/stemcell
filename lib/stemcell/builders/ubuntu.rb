@@ -17,35 +17,6 @@ module Bosh::Agent::StemCell
   # }
   class UbuntuBuilder < BaseBuilder
 
-    def package_stemcell
-      # unbox the exported thing
-      image_path = File.expand_path "image", @prefix
-
-      Dir.chdir(@prefix) do
-
-        unless system "tar -xzf #@name.box"
-          raise "Unable to unpack exported .box file"
-        end
-
-        # tar up the vmdk, ovf files to 'image'
-        unless system "tar -czf #{image_path} *.vmdk *.ovf"
-          raise "Unable to create image tar from ovf and vmdk"
-        end
-
-      end
-
-      # Create the stemcell manifest
-      stemcell_mf_path = File.expand_path "stemcell.MF", @prefix
-      File.open(stemcell_mf_path, "w") do |f|
-        f.write(@manifest.to_yaml)
-      end
-
-      # TODO: deal with package list
-      legal_package_list = File.expand_path "stemcell_dpkg_l.txt", @prefix
-
-      package_files image_path, stemcell_mf_path
-    end
-
     def initialize(opts={}, manifest={})
       super(
           opts.deep_merge(

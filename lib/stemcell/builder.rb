@@ -99,8 +99,31 @@ module Bosh::Agent::StemCell
     end
 
     # Packages the stemcell contents (defined as the array of file path argument)
-    def package_stemcell
-      raise 'not implemented'
+    def package_stemcell(*files)
+      # unbox the exported thing
+      image_path = File.expand_path "image", @prefix
+
+      Dir.chdir(@prefix) do
+
+        unless system "tar -xzf #@name.box"
+          raise "Unable to unpack exported .box file"
+        end
+
+        # tar up the vmdk, ovf files to 'image'
+        unless system "tar -czf #{image_path} *.vmdk *.ovf"
+          raise "Unable to create image tar from ovf and vmdk"
+        end
+
+      end
+
+      # Create the stemcell manifest
+      stemcell_mf_path = File.expand_path "stemcell.MF", @prefix
+      File.open(stemcell_mf_path, "w") do |f|
+        f.write(@manifest.to_yaml)
+      end
+      
+      files.push image_path, stemcell_mf_path
+      package_files(files)
     end
 
     # Main execution method that sets up the directory, builds the VM and packages everything into a stemcell
@@ -142,13 +165,16 @@ module Bosh::Agent::StemCell
         files_str = files.join(" ")
         @logger.info "Packaging #{files_str} to #@target"
         Dir.mktmpdir{|tmpdir|
+          
           # copy files
           FileUtils.cp files, tmpdir
+
           Dir.chdir(tmpdir) {
             unless Kernel.system("tar -czf #{@target} * -C #{tmpdir}")
               raise "unable to package #{files_str} into a stemcell"
             end
           }
+          
         }
       end
     end

@@ -4,7 +4,7 @@ source _variables.sh
 
 ### stage bosh_monit
 mkdir -p $bosh_dir/etc
-cp $HOME/_monitrc $bosh_dir/etc/monitrc
+cp _monitrc $bosh_dir/etc/monitrc
 chmod 0700 $bosh_dir/etc/monitrc
 
 yum -y install pam-devel

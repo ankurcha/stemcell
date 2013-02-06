@@ -4,7 +4,7 @@ source _variables.sh
 
 ### stage bosh_monit
 mkdir -p $bosh_dir/etc
-cp $HOME/_monitrc $bosh_dir/etc/monitrc
+cp $SRC_DIR/_monitrc $bosh_dir/etc/monitrc
 chmod 0700 $bosh_dir/etc/monitrc
 
 pushd /tmp
