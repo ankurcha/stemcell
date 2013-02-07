@@ -20,7 +20,6 @@ module Bosh::Agent::StemCell
     attr_accessor :prefix, :target
     attr_accessor :iso, :iso_md5, :iso_filename
     attr_accessor :logger
-    attr_accessor :manifest
 
     # Stemcell builders are initialized with a manifest and a set of options. The options provided are merged with the
     # defaults to allow the end user/developer to specify only the ones that they wish to change and fallback to the defaults.
@@ -52,9 +51,27 @@ module Bosh::Agent::StemCell
     #    :root_device_name => '/dev/sda1'
     #  }
     #}
-    def initialize(opts={}, manifest={})
-      initialize_instance_vars(opts)
-      initialize_manifest(manifest)
+    def initialize(opts)
+      @logger = opts[:logger] || Logger.new(STDOUT)
+      @name = opts[:name] || DEFAULT_STEMCELL_NAME
+      @prefix = opts[:prefix] || Dir.pwd
+      @infrastructure = opts[:infrastructure] || DEFAULT_INFRASTRUCTURE
+      @architecture = opts[:architecture] || DEFAULT_ARCHITECTURE
+      @agent_version = Bosh::Agent::VERSION
+      @bosh_protocol = Bosh::Agent::BOSH_PROTOCOL
+      @agent_src_path = opts[:agent_src_path] || "./bosh_agent-#{agent_version}.gem"
+      @target ||= File.join(@prefix, "bosh-#{type}-#{@agent_version}.tgz")
+      @iso = opts[:iso]
+      @iso_md5 = opts[:iso_md5]
+
+      if @iso
+        unless @iso_md5
+          raise "MD5 must be specified is ISO is specified"
+        end
+        @iso_filename ||= File.basename @iso
+      else
+        init_default_iso
+      end
 
       sanity_check
     end
@@ -106,7 +123,7 @@ module Bosh::Agent::StemCell
     def generate_manifest
       stemcell_mf_path = File.expand_path "stemcell.MF", @prefix
       File.open(stemcell_mf_path, "w") do |f|
-        f.write(@manifest.to_yaml)
+        f.write(manifest.to_yaml)
       end
     end
 
@@ -131,6 +148,19 @@ module Bosh::Agent::StemCell
       setup
       build_vm
       package_stemcell
+    end
+
+    def manifest
+      @manifest ||= {
+        :name => @name,
+        :version => @agent_version,
+        :bosh_protocol => @bosh_protocol,
+        :cloud_properties => {
+          :root_device_name => DEFAULT_DEVICE_NAME,
+          :infrastructure => @infrastructure,
+          :architecture => @architecture
+        }
+      }
     end
 
     protected
@@ -172,47 +202,6 @@ module Bosh::Agent::StemCell
     end
 
 private
-
-    # Initialize all the options passed to the builder as instance variables after merging with the default values.
-    def initialize_instance_vars(opts)
-      @logger = opts[:logger] || Logger.new(STDOUT)
-      @name = opts[:name] || DEFAULT_STEMCELL_NAME
-      @prefix = opts[:prefix] || Dir.pwd
-      @infrastructure = opts[:infrastructure] || DEFAULT_INFRASTRUCTURE
-      @architecture = opts[:architecture] || DEFAULT_ARCHITECTURE
-      @agent_version = Bosh::Agent::VERSION
-      @bosh_protocol = Bosh::Agent::BOSH_PROTOCOL
-      @agent_src_path = opts[:agent_src_path] || "./bosh_agent-#{agent_version}.gem"
-      @target ||= File.join(@prefix, "bosh-#{type}-#{@agent_version}.tgz")
-      @iso = opts[:iso]
-      @iso_md5 = opts[:iso_md5]
-
-      if @iso
-        unless @iso_md5
-          raise "MD5 must be specified is ISO is specified"
-        end
-        @iso_filename ||= File.basename @iso
-      else
-        init_default_iso
-      end
-    end
-
-    # Merges the given manifest with the default values and assign it to the @manifest instance variable which is later
-    # used to generate the stemcell.MF ( the stemcell manifest) that is put in the generated stemcell archive.
-    def initialize_manifest(manifest={})
-      # perform a deep_merge of the provided manifest with the defaults
-      @manifest = manifest.deep_merge(
-        {
-          :name => @name,
-          :version => @agent_version,
-          :bosh_protocol => @bosh_protocol,
-          :cloud_properties => {
-            :infrastructure => @infrastructure,
-            :architecture => @architecture
-          }
-        }
-      )
-    end
 
     def sanity_check
       @logger.info "Sanity check"

@@ -6,7 +6,7 @@ describe Bosh::Agent::StemCell::CentosBuilder do
   before(:each) do
     @agent_file = File.join("bosh-agent.gem")
     FileUtils.touch @agent_file
-    @stemcell = Bosh::Agent::StemCell::CentosBuilder.new({:agent_src_path => @agent_file}, {})
+    @stemcell = Bosh::Agent::StemCell::CentosBuilder.new({:agent_src_path => @agent_file})
   end
 
   after(:each) do
