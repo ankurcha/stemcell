@@ -2,6 +2,8 @@ require 'spec_helper'
 
 describe Bosh::Agent::StemCell::BaseBuilder do
 
+  include Bosh::Agent::StemCell
+
   class TestBuilder < Bosh::Agent::StemCell::BaseBuilder
     def type
       "noop"
@@ -15,7 +17,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
     @prefix_dir = Dir.mktmpdir
     @agent_file = File.join(@prefix_dir, "bosh_agent-#{Bosh::Agent::VERSION}.gem")
     FileUtils.touch @agent_file
-    @stemcell = TestBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file}, {})
+    @stemcell = TestBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file})
   end
 
   after(:each) do
@@ -34,7 +36,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
   end
 
   it "Should initialize all override ISOs properly" do
-    @stemcell = TestBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file, :iso => "http://example.com/example.iso", :iso_md5 => "example-md5", :iso_filename => "example.iso"}, {})
+    @stemcell = TestBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file, :iso => "http://example.com/example.iso", :iso_md5 => "example-md5", :iso_filename => "example.iso"})
     @stemcell.iso.should eq "http://example.com/example.iso"
     @stemcell.iso_md5.should eq "example-md5"
     @stemcell.iso_filename.should eq "example.iso"
@@ -46,6 +48,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
         :version => Bosh::Agent::VERSION,
         :bosh_protocol => Bosh::Agent::BOSH_PROTOCOL,
         :cloud_properties => {
+            :root_device_name => DEFAULT_DEVICE_NAME,
             :infrastructure => 'vsphere',
             :architecture => 'x86_64'
         }
@@ -53,23 +56,6 @@ describe Bosh::Agent::StemCell::BaseBuilder do
 
     @stemcell.manifest.should eq(defaults)
 
-  end
-
-  it "Initializes the stemcell manifest with defaults and deep_merges the provided args" do
-    manifest = {
-        :name => 'test-stemcell-name',
-        :version => Bosh::Agent::VERSION,
-        :bosh_protocol => Bosh::Agent::BOSH_PROTOCOL,
-        :cloud_properties => {
-            :infrastructure => 'vsphere',
-            :architecture => 'x86_64',
-            :key => 'value'
-        }
-    }
-
-    override_stemcell = TestBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file}, {:name => 'test-stemcell-name',:cloud_properties => {:key => 'value'}})
-
-    override_stemcell.manifest.should eq(manifest)
   end
 
   it "Initializes the options with defaults" do
@@ -80,7 +66,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
   end
 
   it "Initializes the options with defaults and deep_merges the provided args" do
-    override_stemcell = TestBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file}, {:name => 'test-stemcell-name',:cloud_properties => {:key => 'value'}})
+    override_stemcell = TestBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file})
     override_stemcell.name.should eq "bosh-stemcell"
     override_stemcell.type.should eq "noop"
   end
@@ -119,7 +105,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
 
   it "Should invoke the methods in the correct order (setup -> build_vm -> package_vm -> finalize)" do
 
-    @stemcell = Bosh::Agent::StemCell::NoOpBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file}, {})
+    @stemcell = Bosh::Agent::StemCell::NoOpBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file})
 
     @stemcell.run # all steps completed properly
 

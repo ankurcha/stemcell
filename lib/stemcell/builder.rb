@@ -51,9 +51,9 @@ module Bosh::Agent::StemCell
     #    :architecture => @architecture
     #  }
     #}
-    def initialize(opts={}, manifest={})
+    def initialize(opts)
       initialize_instance_vars(opts)
-      initialize_manifest(manifest)
+      initialize_manifest
 
       sanity_check
     end
@@ -198,19 +198,18 @@ private
 
     # Merges the given manifest with the default values and assign it to the @manifest instance variable which is later
     # used to generate the stemcell.MF ( the stemcell manifest) that is put in the generated stemcell archive.
-    def initialize_manifest(manifest={})
+    def initialize_manifest
       # perform a deep_merge of the provided manifest with the defaults
-      @manifest = manifest.deep_merge(
-        {
-          :name => @name,
-          :version => @agent_version,
-          :bosh_protocol => @bosh_protocol,
-          :cloud_properties => {
-            :infrastructure => @infrastructure,
-            :architecture => @architecture
-          }
+      @manifest = {
+        :name => @name,
+        :version => @agent_version,
+        :bosh_protocol => @bosh_protocol,
+        :cloud_properties => {
+          :root_device_name => DEFAULT_DEVICE_NAME,
+          :infrastructure => @infrastructure,
+          :architecture => @architecture
         }
-      )
+      }
     end
 
     def sanity_check

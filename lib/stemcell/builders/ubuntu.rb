@@ -27,10 +27,6 @@ module Bosh::Agent::StemCell
       @iso_filename = "ubuntu-11.04-server-amd64.iso"
     end
 
-    def initialize(opts={}, manifest={})
-      super(opts, manifest.deep_merge({:cloud_properties => {:root_device_name => '/dev/sda1'}}))
-    end
-
   end
 
 end
