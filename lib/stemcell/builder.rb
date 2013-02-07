@@ -53,10 +53,10 @@ module Bosh::Agent::StemCell
     #}
     def initialize(opts)
       @logger = opts[:logger] || Logger.new(STDOUT)
-      @name = opts[:name] || DEFAULT_STEMCELL_NAME
+      @name = opts[:name] || Bosh::Agent::StemCell::DEFAULT_STEMCELL_NAME
       @prefix = opts[:prefix] || Dir.pwd
-      @infrastructure = opts[:infrastructure] || DEFAULT_INFRASTRUCTURE
-      @architecture = opts[:architecture] || DEFAULT_ARCHITECTURE
+      @infrastructure = opts[:infrastructure] || Bosh::Agent::StemCell::DEFAULT_INFRASTRUCTURE
+      @architecture = opts[:architecture] || Bosh::Agent::StemCell::DEFAULT_ARCHITECTURE
       @agent_version = Bosh::Agent::VERSION
       @bosh_protocol = Bosh::Agent::BOSH_PROTOCOL
       @agent_src_path = opts[:agent_src_path] || "./bosh_agent-#{agent_version}.gem"
@@ -156,7 +156,7 @@ module Bosh::Agent::StemCell
         :version => @agent_version,
         :bosh_protocol => @bosh_protocol,
         :cloud_properties => {
-          :root_device_name => DEFAULT_DEVICE_NAME,
+          :root_device_name => Bosh::Agent::StemCell::DEFAULT_DEVICE_NAME,
           :infrastructure => @infrastructure,
           :architecture => @architecture
         }

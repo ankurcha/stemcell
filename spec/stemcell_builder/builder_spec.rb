@@ -48,7 +48,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
         :version => Bosh::Agent::VERSION,
         :bosh_protocol => Bosh::Agent::BOSH_PROTOCOL,
         :cloud_properties => {
-            :root_device_name => DEFAULT_DEVICE_NAME,
+            :root_device_name => Bosh::Agent::StemCell::DEFAULT_DEVICE_NAME,
             :infrastructure => 'vsphere',
             :architecture => 'x86_64'
         }
