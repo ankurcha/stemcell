@@ -20,9 +20,5 @@ module Bosh::Agent::StemCell
       @iso_filename = "CentOS-6.3-x86_64-minimal.iso"
     end
 
-    def initialize(opts={}, manifest={})
-      super(opts, manifest.deep_merge({:cloud_properties => {:root_device_name => '/dev/sda1'}}))
-    end
-
   end
 end

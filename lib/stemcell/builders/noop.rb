@@ -8,9 +8,9 @@ module Bosh::Agent::StemCell
       "noop"
     end
 
-    def initialize(opts={}, manifest={})
+    def initialize(opts)
       @counter = 0
-      super(opts, manifest)
+      super(opts)
     end
 
     def build_vm
@@ -32,7 +32,6 @@ module Bosh::Agent::StemCell
     end
 
     def init_default_iso
-
     end
 
   end
