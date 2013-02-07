@@ -49,6 +49,7 @@ module Bosh::Agent::StemCell
     # :cloud_properties => {
     #    :infrastructure => @infrastructure,
     #    :architecture => @architecture
+    #    :root_device_name => '/dev/sda1'
     #  }
     #}
     def initialize(opts={}, manifest={})
