@@ -1,5 +1,6 @@
 #!/bin/bash
 
+source _variables.sh
 ### stage system_open_vm_tools
 ### -> vmware-tools to be fetched from the apt repo <find this repo>
 # open-vm-tools needed to be backported to work with the 2.6.38 kernel

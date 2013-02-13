@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ### stage system_open_vm_tools
+source _variables.sh
 
 cat > /etc/yum.repos.d/vmware-tools.repo << EOM
 [vmware-tools]
