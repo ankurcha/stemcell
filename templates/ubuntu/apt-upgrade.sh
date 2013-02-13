@@ -1,5 +1,6 @@
 #!/bin/bash
 
+source _variables.sh
 # Upgrade all packages
 apt-get -y update
 

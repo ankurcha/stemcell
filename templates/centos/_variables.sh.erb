@@ -20,3 +20,12 @@ export PATH
 	export PATH=$PATH:$bosh_dir/bin
 fi
 
+<% if ENV['HTTP_PROXY'] || ENV['http_proxy'] %>
+export HTTP_PROXY=<%= ENV['HTTP_PROXY'] || ENV['http_proxy'] %>
+export http_proxy=<%= ENV['HTTP_PROXY'] || ENV['http_proxy'] %>
+<% end %>
+
+<% if ENV['HTTPS_PROXY'] || ENV['https_proxy'] %>
+export HTTPS_PROXY=<%= ENV['HTTPS_PROXY'] || ENV['https_proxy'] %>
+export https_proxy=<%= ENV['HTTPS_PROXY'] || ENV['https_proxy'] %>
+<% end %>
