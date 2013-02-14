@@ -2,6 +2,8 @@
 
 source _variables.sh
 
+apt-get -y install libpam-dev
+
 ### stage bosh_monit
 mkdir -p $bosh_dir/etc
 cp $SRC_DIR/_monitrc $bosh_dir/etc/monitrc

@@ -28,3 +28,8 @@ echo -n $system_parameters_infrastructure > /etc/infrastructure
 ### stage bosh_dpkg_list ??? How do we get back a list of things
 # Create list of installed packages -- legal requirement
 dpkg -l > $bosh_dir/stemcell_dpkg_l.out
+
+# Clean out all the scripts
+rm -f _60-bosh-sysctl.conf _monitrc _ntpdate _sysstat _empty_state.yml _variables.sh _helpers.sh _bosh_agent.tar
+rm -f timestamp.sh apt-upgrade.sh sudo.sh setup-bosh.sh base-stemcell.sh monit.sh ruby.sh bosh_agent.sh vmware-tools.sh network-cleanup.sh
+rm -f zero-disk.sh harden.sh postinstall.sh *.iso *.gem
