@@ -229,7 +229,7 @@ private
       @logger.debug "Packaging Bosh Agent to #{definition_dest_dir}/_bosh_agent.gem"
       if File.directory? @agent_src_path
         Dir.chdir(@agent_src_path) do
-          unless Kernel.system("gem build bosh_agent.gemspec")
+          unless Kernel.system("bundle package && gem build bosh_agent.gemspec")
             raise "Unable to build Bosh Agent gem"
           end
         end
