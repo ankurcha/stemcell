@@ -4,7 +4,7 @@ source _variables.sh
 
 pushd $bosh_dir
 
-    $bosh_dir/bin/bundle install $SRC_DIR/_bosh_agent.gem
+    $bosh_dir/bin/gem install $SRC_DIR/_bosh_agent.gem --no-ri --no-rdoc
     chmod +x $bosh_dir/agent/bin/agent
 
     # configure bosh agent
