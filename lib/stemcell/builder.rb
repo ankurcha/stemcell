@@ -226,17 +226,30 @@ private
     # Packages the agent into a bosh_agent gem and copies it over to definition_dest_dir
     # so that it can be used as a part of the VM building process by veewee (using the definition).
     def package_agent
-      @logger.debug "Packaging Bosh Agent to #{definition_dest_dir}/_bosh_agent.gem"
+      @logger.debug "Packaging Bosh Agent to #{definition_dest_dir}/_bosh_agent.tar"
+      dst = File.join(definition_dest_dir, "_bosh_agent.tar")
       if File.directory? @agent_src_path
         Dir.chdir(@agent_src_path) do
           unless Kernel.system("bundle package && gem build bosh_agent.gemspec")
             raise "Unable to build Bosh Agent gem"
           end
+          Dir.chdir(File.join("vendor", "cache")) do
+            unless Kernel.system("tar -cf #{dst} *.gem")
+              raise "Unable to package bosh gems"
+            end
+          end
+          #tar -rf _bosh_agent.tar *.gem
+          #
+          unless Kernel.system("tar -rf #{dst} *.gem")
+            raise "Unable to add bosh_agent gem to #{dst}"
+          end
         end
-        # copy gem to definitions
-        FileUtils.mv(File.join(@agent_src_path, "bosh_agent-#@agent_version.gem"), File.join(definition_dest_dir, "_bosh_agent.gem"))
       else
-        FileUtils.cp @agent_src_path, File.join(definition_dest_dir, "_bosh_agent.gem")
+        Dir.chdir(File.dirname(@agent_src_path)) do
+          unless Kernel.system("tar -cf #{dst} #@agent_src_path")
+            raise "Unable to package bosh gems"
+          end
+        end
       end
     end
 
