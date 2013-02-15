@@ -22,7 +22,11 @@ module StemCellBuilderCLI
     class_option :target,         :banner => "<target>",
                                   :desc => "Path for the final stemcell"
     class_option :agent_src_path, :banner => "<agent_src_path>",
-                                  :desc => "Bosh Agent Source path"
+                                  :desc => "Bosh Agent Source path, this may be the gem or directory path of Bosh agent source"
+    class_option :agent_version,  :banner => "<agent_version>",
+                                  :desc => "Bosh Agent version being installed"
+    class_option :agent_protocol, :banner => "<agent_protocol_version>",
+                                  :desc => "Bosh Agent Protocol Version being installed"
     class_option :iso,            :banner => "<iso file path>",
                                   :desc => "Path to the iso file to use"
     class_option :iso_md5,        :banner => "<MD5 of iso file>",

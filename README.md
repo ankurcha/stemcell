@@ -19,36 +19,41 @@ Or install it yourself as:
 ## Usage
 
 The following is a listing of commands
-
-    stemcell build SUBCOMMAND ...ARGS  # Build a new stemcell
-    stemcell help [TASK]               # Describe available tasks or one specific task
-    stemcell info <file>               # Display stemcell information, it looks for stemcell file name <file>
-
+```
+Tasks:
+  stemcell build SUBCOMMAND ...ARGS  # Build a new stemcell
+  stemcell help [TASK]               # Describe available tasks or one specific task
+  stemcell info <file>               # Display stemcell information, it looks for stemcell file name <file>
+```
 The `stemcell build` command gives the following options
 
+```
 Tasks:
-   stemcell build help [COMMAND]  # Describe subcommands or one specific subcommand
-   stemcell build noop <name>     # Build a new noop stemcell named <name> [this is good for testing only]
-   stemcell build redhat <name>   # Build a new redhat stemcell named <name>
-   stemcell build ubuntu <name>   # Build a new ubuntu stemcell named <name>
-   stemcell build centos <name>   # Build a new centos stemcell named <name>
+  stemcell build centos          # Build a new redhat stemcell
+  stemcell build help [COMMAND]  # Describe subcommands or one specific subcommand
+  stemcell build noop            # Build a new noop stemcell [this is good for testing only]
+  stemcell build redhat          # Build a new redhat stemcell
+  stemcell build ubuntu          # Build a new ubuntu stemcell
 
 Options:
-   [--prefix=<prefix>]                  # Directory to use as staging area for all the stemcell work
-					# Default: /Users/ankurc/stemcell
-   [--architecture=<architecture>]      # Architecture of the OS
-					# Default: x86_64
-   [--infrastructure=<infrastructure>]  # Infrastructure hosting the vm
-					# Default: vsphere
-   [--target=<target>]                  # Path for the final stemcell
-   [--agent-src-path=<agent_src_path>]  # Bosh Agent Source path
-   [--agent-version=<agent version>]    # Bosh Agent Version
-					# Default: 0.7.0
-   [--bosh-protocol=<bosh_protocol>]    # Bosh Protocol Version
-					# Default: 1
-   [--iso=<iso file path>]              # Path to the iso file to use
-   [--iso-md5=<MD5 of iso file>]        # MD5 of the ISO
+  [--name=<name>]                              # Name of the stemcell
+  [--prefix=<prefix>]                          # Directory to use as staging area for all the stemcell work
+  [--architecture=<architecture>]              # Architecture of the OS
+  [--infrastructure=<infrastructure>]          # Infrastructure hosting the vm
+  [--target=<target>]                          # Path for the final stemcell
+  [--agent-src-path=<agent_src_path>]          # Bosh Agent Source path, this may be the gem or directory path of Bosh agent source
+  [--agent-version=<agent_version>]            # Bosh Agent version being installed
+  [--agent-protocol=<agent_protocol_version>]  # Bosh Agent Protocol Version being installed
+  [--iso=<iso file path>]                      # Path to the iso file to use
+  [--iso-md5=<MD5 of iso file>]                # MD5 of the ISO
+```
 
+## TODO
+This tool is in pre-alpha and supports only a small subset of operations. Currently, the tool is targeted
+to be able to create vsphere templates for ubuntu and centOS6. The following is a list of things
+that need to be done before we can call it ready for primetime (in order of priority).
+* Support AWS
+* Support Openstack
 
 ## Contributing
 

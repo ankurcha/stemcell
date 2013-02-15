@@ -57,9 +57,9 @@ module Bosh::Agent::StemCell
       @prefix = opts[:prefix] || Dir.pwd
       @infrastructure = opts[:infrastructure] || Bosh::Agent::StemCell::DEFAULT_INFRASTRUCTURE
       @architecture = opts[:architecture] || Bosh::Agent::StemCell::DEFAULT_ARCHITECTURE
-      @agent_version = Bosh::Agent::VERSION
-      @bosh_protocol = Bosh::Agent::BOSH_PROTOCOL
-      @agent_src_path = opts[:agent_src_path] || "./bosh_agent-#{agent_version}.gem"
+      @agent_version = opts[:agent_version] || Bosh::Agent::VERSION
+      @bosh_protocol = opts[:agent_protocol] || Bosh::Agent::BOSH_PROTOCOL
+      @agent_src_path = opts[:agent_src_path] || "./bosh_agent-#{@agent_version}.gem"
       @target ||= File.join(@prefix, "bosh-#{type}-#{@agent_version}.tgz")
       @iso = opts[:iso]
       @iso_md5 = opts[:iso_md5]
