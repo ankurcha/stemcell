@@ -16,6 +16,9 @@ Or install it yourself as:
 
     $ gem install stemcell
 
+Install virtualbox
+    Follow instructions on: [VirtualBox Download Page](https://www.virtualbox.org/wiki/Downloads)
+
 ## Usage
 
 The following is a listing of commands
