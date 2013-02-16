@@ -248,7 +248,7 @@ private
     end
 
     def definition_dest_dir
-      File.join(@prefix, "definitions", @name)
+      File.expand_path File.join(@prefix, "definitions", @name)
     end
 
     def compile_erb(erb_file, dst_file=nil)
