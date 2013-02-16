@@ -24,6 +24,14 @@ describe Bosh::Agent::StemCell::CentosBuilder do
     @stemcell.iso_filename.should eq "CentOS-6.3-x86_64-minimal.iso"
   end
 
+  it "Should initialize override options properly" do
+    @stemcell = Bosh::Agent::StemCell::CentosBuilder.new({:agent_src_path => @agent_file, :iso => "http://example.com/centos.iso", :iso_md5 => "123", :iso_filename => "centos.iso"})
+    @stemcell.type.should eq "centos"
+    @stemcell.iso.should eq "http://example.com/centos.iso"
+    @stemcell.iso_md5.should eq "123"
+    @stemcell.iso_filename.should eq "centos.iso"
+  end
+
   it "Should initialize type properly" do
     @stemcell.type.should eq "centos"
   end
