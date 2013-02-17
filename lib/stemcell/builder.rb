@@ -217,7 +217,7 @@ private
       if File.directory? @agent_src_path
         Dir.chdir(@agent_src_path) do
           system("bundle package && gem build bosh_agent.gemspec", {:on_error => "Unable to build Bosh Agent gem"})
-          Dir.chdir(File.join("vendor", "cache")) do
+          Dir.chdir(File.join(@agent_src_path, "vendor", "cache")) do
             system("tar -cf #{dst} *.gem", {:on_error => "Unable to package bosh gems"})
           end
           system("tar -rf #{dst} *.gem", {:on_error => "Unable to add bosh_agent gem to #{dst}"})
