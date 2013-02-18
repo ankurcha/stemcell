@@ -31,6 +31,10 @@ module StemCellBuilderCLI
                                   :desc => "Path to the iso file to use"
     class_option :iso_md5,        :banner => "<MD5 of iso file>",
                                   :desc => "MD5 of the ISO"
+    class_option :nogui,          :banner => "No GUI",
+                                  :desc => "Run virtualbox headless",
+                                  :type => :boolean,
+                                  :default => true
 
     desc "ubuntu", "Build a new ubuntu stemcell"
     def ubuntu

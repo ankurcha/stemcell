@@ -17,7 +17,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
     @prefix_dir = Dir.mktmpdir
     @agent_file = File.join(@prefix_dir, "bosh_agent-#{Bosh::Agent::VERSION}.gem")
     FileUtils.touch @agent_file
-    @stemcell = TestBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file})
+    @stemcell = TestBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file, :nogui => true})
   end
 
   after(:each) do
@@ -78,7 +78,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
 
   it "Build VM works properly" do
     # Expectations
-    Kernel.should_receive(:system).with("veewee vbox build '#{@stemcell.name}' --force --nogui --auto").and_return(true)
+    Kernel.should_receive(:system).with("veewee vbox build '#{@stemcell.name}' --force --auto --nogui").and_return(true)
     Kernel.should_receive(:system).with("vagrant basebox export '#{@stemcell.name}' --force").and_return(true)
 
     Kernel.should_receive(:system).with("veewee vbox destroy '#{@stemcell.name}' --force --nogui").and_return(true)

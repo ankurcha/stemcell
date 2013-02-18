@@ -63,6 +63,7 @@ module Bosh::Agent::StemCell
       @target = File.expand_path( @target || File.join(@prefix, "bosh-#{type}-#{@agent_version}.tgz"))
       @iso = opts[:iso]
       @iso_md5 = opts[:iso_md5]
+      @nogui = opts[:nogui]
 
       if @iso
         unless @iso_md5
@@ -88,13 +89,15 @@ module Bosh::Agent::StemCell
     def build_vm
       Dir.chdir(@prefix) do
         @logger.info "Building vm #@name"
-        execute_veewee_cmd "build '#@name' --force --nogui --auto", {:on_error => "Unable to build vm #@name"}
+        nogui_str = @nogui ? "--nogui" : ""
+        
+        execute_veewee_cmd "build '#@name' --force --auto #{nogui_str}", {:on_error => "Unable to build vm #@name"}
 
         @logger.info "Export built VM #@name to #@prefix"
         system "vagrant basebox export '#@name' --force", {:on_error => "Unable to export VM #@name: vagrant basebox export '#@name'"}
 
         @logger.debug "Sending veewee destroy for #@name"
-        execute_veewee_cmd "destroy '#@name' --force --nogui"
+        execute_veewee_cmd "destroy '#@name' --force #{nogui_str}"
       end
 
     end
