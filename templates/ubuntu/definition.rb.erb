@@ -1,6 +1,7 @@
 Veewee::Definition.declare({
                                :cpu_count => '1', :memory_size => '512',
                                :disk_size => '10140', :disk_format => 'VDI', :hostiocache => 'off',
+                               :virtualbox => { :vm_options => ["pae" => "on", "ioapic" => "on"]},
                                :os_type_id => 'Ubuntu_64',
                                :iso_file => "<%= @iso_filename %>",
                                :iso_src => "<%= @iso %>",
