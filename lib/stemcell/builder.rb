@@ -247,11 +247,11 @@ private
     end
 
     def definition_dir
-      File.join(File.dirname(__FILE__), "..", "..", "templates", type)
+      @definition_dir ||= File.join(File.dirname(__FILE__), "..", "..", "templates", type)
     end
 
     def definition_dest_dir
-      File.join(@prefix, "definitions", @name)
+      @definition_dest_dir ||= File.join(@prefix, "definitions", @name)
     end
 
     def compile_erb(erb_file, dst_file=nil)
