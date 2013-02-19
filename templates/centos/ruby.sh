@@ -12,7 +12,8 @@ pushd /tmp
     tar zxf ruby-1.9.3-p374.tar.gz
     cd ruby-1.9.3-p374
     ./configure --prefix=$bosh_dir --disable-install-doc
-    make && make install
+    make
+    make install
 popd
 
 pushd /tmp
