@@ -5,12 +5,6 @@ require 'digest/md5'
 
 module Bosh::Agent::StemCell
 
-  # The source root is the path to the root directory of
-  # the Veewee gem.
-  def self.source_root
-    @source_root ||= Pathname.new(File.expand_path('../../', __FILE__))
-  end
-
   # This BaseBuilder abstract class represents the base stemcell builder and should be extended by specific stemcell
   # builders for different distributions
   class BaseBuilder
@@ -54,16 +48,16 @@ module Bosh::Agent::StemCell
     def initialize(opts)
       @logger = opts[:logger] || Logger.new(STDOUT)
       @name = opts[:name] || Bosh::Agent::StemCell::DEFAULT_STEMCELL_NAME
-      @prefix = opts[:prefix] || Dir.pwd
+      @prefix = File.expand_path(opts[:prefix] || Dir.pwd)
       @infrastructure = opts[:infrastructure] || Bosh::Agent::StemCell::DEFAULT_INFRASTRUCTURE
       @architecture = opts[:architecture] || Bosh::Agent::StemCell::DEFAULT_ARCHITECTURE
       @agent_version = opts[:agent_version] || Bosh::Agent::VERSION
       @bosh_protocol = opts[:agent_protocol] || Bosh::Agent::BOSH_PROTOCOL
       @agent_src_path = File.expand_path(opts[:agent_src_path] || "./bosh_agent-#{@agent_version}.gem")
-      @target = File.expand_path( @target || File.join(@prefix, "bosh-#{type}-#{@agent_version}.tgz"))
+      @target ||= File.join(@prefix, "bosh-#{type}-#{@agent_version}.tgz")
       @iso = opts[:iso]
       @iso_md5 = opts[:iso_md5]
-      @nogui = opts[:nogui]
+      @gui = opts[:gui]
 
       if @iso
         unless @iso_md5
@@ -89,8 +83,8 @@ module Bosh::Agent::StemCell
     def build_vm
       Dir.chdir(@prefix) do
         @logger.info "Building vm #@name"
-        nogui_str = @nogui ? "--nogui" : ""
-        
+        nogui_str = gui? ? "" : "--nogui"
+
         execute_veewee_cmd "build '#@name' --force --auto #{nogui_str}", {:on_error => "Unable to build vm #@name"}
 
         @logger.info "Export built VM #@name to #@prefix"
@@ -247,11 +241,15 @@ private
     end
 
     def definition_dir
-      File.join(File.dirname(__FILE__), "..", "..", "templates", type)
+      @definition_dir ||= File.join(File.dirname(__FILE__), "..", "..", "templates", type)
     end
 
     def definition_dest_dir
-      File.expand_path File.join(@prefix, "definitions", @name)
+      @definition_dest_dir ||= File.join(@prefix, "definitions", @name)
+    end
+
+    def gui?
+      !!@gui
     end
 
     def compile_erb(erb_file, dst_file=nil)
