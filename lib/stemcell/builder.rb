@@ -54,7 +54,7 @@ module Bosh::Agent::StemCell
     def initialize(opts)
       @logger = opts[:logger] || Logger.new(STDOUT)
       @name = opts[:name] || Bosh::Agent::StemCell::DEFAULT_STEMCELL_NAME
-      @prefix = opts[:prefix] || Dir.pwd
+      @prefix = File.expand_path(opts[:prefix] || Dir.pwd)
       @infrastructure = opts[:infrastructure] || Bosh::Agent::StemCell::DEFAULT_INFRASTRUCTURE
       @architecture = opts[:architecture] || Bosh::Agent::StemCell::DEFAULT_ARCHITECTURE
       @agent_version = opts[:agent_version] || Bosh::Agent::VERSION
@@ -251,7 +251,7 @@ private
     end
 
     def definition_dest_dir
-      File.expand_path File.join(@prefix, "definitions", @name)
+      File.join(@prefix, "definitions", @name)
     end
 
     def compile_erb(erb_file, dst_file=nil)
