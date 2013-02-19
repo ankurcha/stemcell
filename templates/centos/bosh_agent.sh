@@ -8,7 +8,7 @@ pushd /tmp/bosh_agent
     cp $SRC_DIR/_bosh_agent.tar /tmp/bosh_agent
     tar -xvf _bosh_agent.tar
     $bosh_dir/bin/gem install *.gem --no-ri --no-rdoc
-    chmod +x $bosh_dir/agent/bin/bosh_agent
+    chmod +x $bosh_dir/bin/bosh_agent
 
     # configure bosh agent
     mkdir -p /etc/sv/agent/log
