@@ -57,7 +57,7 @@ module Bosh::Agent::StemCell
       @target ||= File.join(@prefix, "bosh-#{type}-#{@agent_version}.tgz")
       @iso = opts[:iso]
       @iso_md5 = opts[:iso_md5]
-      @nogui = opts[:nogui]
+      @gui = opts[:gui]
 
       if @iso
         unless @iso_md5
@@ -83,8 +83,8 @@ module Bosh::Agent::StemCell
     def build_vm
       Dir.chdir(@prefix) do
         @logger.info "Building vm #@name"
-        nogui_str = @nogui ? "--nogui" : ""
-        
+        nogui_str = gui? ? "" : "--nogui"
+
         execute_veewee_cmd "build '#@name' --force --auto #{nogui_str}", {:on_error => "Unable to build vm #@name"}
 
         @logger.info "Export built VM #@name to #@prefix"
@@ -246,6 +246,10 @@ private
 
     def definition_dest_dir
       @definition_dest_dir ||= File.join(@prefix, "definitions", @name)
+    end
+
+    def gui?
+      !!@gui
     end
 
     def compile_erb(erb_file, dst_file=nil)
