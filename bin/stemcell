@@ -46,7 +46,7 @@ module StemCellBuilderCLI
       Bosh::Agent::StemCell::RedhatBuilder.new(options.dup).run
     end
 
-    desc "centos", "Build a new redhat stemcell"
+    desc "centos", "Build a new centos stemcell"
     def centos
       Bosh::Agent::StemCell::CentosBuilder.new(options.dup).run
     end
