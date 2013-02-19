@@ -5,12 +5,6 @@ require 'digest/md5'
 
 module Bosh::Agent::StemCell
 
-  # The source root is the path to the root directory of
-  # the Veewee gem.
-  def self.source_root
-    @source_root ||= Pathname.new(File.expand_path('../../', __FILE__))
-  end
-
   # This BaseBuilder abstract class represents the base stemcell builder and should be extended by specific stemcell
   # builders for different distributions
   class BaseBuilder
