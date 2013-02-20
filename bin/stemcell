@@ -42,6 +42,12 @@ module StemCellBuilderCLI
     end
 
     desc "redhat", "Build a new redhat stemcell"
+    method_option :rhn_user,      :type => :string, 
+                                  :banner => "<rhn username>",
+                                  :desc => "Redhat Network Username"
+    method_option :rhn_pass,      :type => :string, 
+                                  :banner => "<rhn password>",
+                                  :desc => "Redhat Network Password"
     def redhat
       Bosh::Agent::StemCell::RedhatBuilder.new(options.dup).run
     end

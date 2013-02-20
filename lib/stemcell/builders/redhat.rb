@@ -2,6 +2,12 @@ module Bosh::Agent::StemCell
 
   class RedhatBuilder < BaseBuilder
 
+    def initialize(opts)
+      @rhn_user ||= opts[:rhn_user]
+      @rhn_pass ||= opts[:rhn_pass]
+      super(opts)
+    end
+
     def type
       "redhat"
     end
