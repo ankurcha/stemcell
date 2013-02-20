@@ -98,11 +98,11 @@ module Bosh::Agent::StemCell
     end
 
     def type
-      raise "Type must be initialized"
+      raise NotImplementedError.new("Type must be initialized")
     end
 
     def init_default_iso
-      raise "Default ISO options must be provided"
+      raise NotImplementedError.new("Default ISO options must be provided")
     end
 
     # Packages the stemcell contents (defined as the array of file path argument)
@@ -273,7 +273,9 @@ private
       exit_status = $?.exitstatus
 
       # raise error only if silent is not true and exit_status != 0
-      raise opts[:on_error] unless opts[:silent] if exit_status != 0
+      if exit_status != 0
+        raise opts[:on_error] unless opts[:silent]
+      end
 
       exit_status
     end

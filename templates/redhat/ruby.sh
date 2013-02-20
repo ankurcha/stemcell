@@ -4,7 +4,15 @@ set -x
 
 source _variables.sh
 
-# yum -y install ruby ruby-devel rubygems
+# install libyaml
+pushd /tmp
+	[ ! -f "yaml-0.1.4.tar.gz" ] && wget http://pyyaml.org/download/libyaml/yaml-0.1.4.tar.gz
+    tar zxf yaml-0.1.4.tar.gz
+    cd yaml-0.1.4
+    ./configure
+    make
+    make install
+popd
 
 # install ruby and rubygems
 pushd /tmp
@@ -12,7 +20,8 @@ pushd /tmp
     tar zxf ruby-1.9.3-p374.tar.gz
     cd ruby-1.9.3-p374
     ./configure --prefix=$bosh_dir --disable-install-doc
-    make && make install
+    make
+    make install
 popd
 
 pushd /tmp
