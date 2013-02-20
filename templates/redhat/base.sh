@@ -26,7 +26,7 @@ name=cfengine
 baseurl=http://cfengine.com/pub/yum/
 enabled=0
 gpgcheck=0
-EOMs
+EOM
 
 # Base install
 sed -i "s/^.*requiretty/#Defaults requiretty/" /etc/sudoers
