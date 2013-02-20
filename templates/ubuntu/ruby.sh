@@ -3,7 +3,8 @@
 source _variables.sh
 
 ### stage bosh_ruby
-apt-get -y --force-yes install gcc g++ build-essential libssl-dev libreadline5-dev zlib1g-dev linux-headers-generic libsqlite3-dev libxslt-dev libxml2-dev imagemagick libmysqlclient-dev libmagick9-dev git-core mysql-server wkhtmltopdf git
+apt-get -y --force-yes install gcc g++ build-essential libssl-dev libreadline5-dev zlib1g-dev
+apt-get -y --force-yes install libsqlite3-dev libxslt-dev libxml2-dev git
 
 # install ruby
 pushd /tmp
