@@ -1,3 +1,4 @@
+require 'logger/colors'
 require 'veewee'
 require 'deep_merge'
 require 'erb'

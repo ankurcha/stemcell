@@ -26,6 +26,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency                "vagrant"
   gem.add_dependency                "thor"
   gem.add_dependency                "deep_merge"
+  gem.add_dependency                "logger-colors"
 
   gem.add_development_dependency    "bundler"
   gem.add_development_dependency    "rake"

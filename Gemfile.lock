@@ -3,6 +3,7 @@ PATH
   specs:
     stemcell (0.0.1)
       deep_merge
+      logger-colors
       thor
       vagrant
       veewee
@@ -53,6 +54,7 @@ GEM
     json (1.5.4)
     libxml-ruby (2.4.0)
     log4r (1.1.10)
+    logger-colors (1.0.0)
     mime-types (1.19)
     multi_json (1.5.0)
     net-scp (1.0.4)
