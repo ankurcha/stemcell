@@ -13,6 +13,20 @@ describe Bosh::Agent::StemCell::RedhatBuilder do
     FileUtils.rm_f @agent_file
   end
 
+  it "Warns about RHN user/password if missing" do
+    logger = Logger.new(STDOUT)
+    logger.should_receive(:warn).with("Redhat Network Username is not specified")
+    logger.should_receive(:warn).with("Redhat Network Password is not specified")
+    @stemcell = Bosh::Agent::StemCell::RedhatBuilder.new({:agent_src_path => @agent_file, :logger => logger})
+  end
+
+  it "Doesn't warn user if RHN user/password is specified" do
+    logger = Logger.new(STDOUT)
+    logger.should_not_receive(:warn).with("Redhat Network Username is not specified")
+    logger.should_not_receive(:warn).with("Redhat Network Password is not specified")
+    @stemcell = Bosh::Agent::StemCell::RedhatBuilder.new({:agent_src_path => @agent_file, :logger => logger, :rhn_user => 'rhn_username', :rhn_pass => 'rhn_password'})
+  end
+
   it "Should initialize type properly" do
     @stemcell.type.should eq "redhat"
   end

@@ -8,6 +8,16 @@ module Bosh::Agent::StemCell
       super(opts)
     end
 
+    def sanity_check
+      super()
+      unless @rhn_user
+        @logger.warn "Redhat Network Username is not specified"
+      end
+      unless @rhn_pass
+        @logger.warn "Redhat Network Password is not specified"
+      end
+    end
+
     def type
       "redhat"
     end

@@ -194,8 +194,6 @@ module Bosh::Agent::StemCell
       end
     end
 
-private
-
     def sanity_check
       @logger.info "Sanity check"
 
@@ -212,6 +210,7 @@ private
       raise "Definition for '#{type}' does not exist at path '#{definition_dir}'" unless Dir.exist? definition_dir
     end
 
+private
     # Packages the agent into a bosh_agent gem and copies it over to definition_dest_dir
     # so that it can be used as a part of the VM building process by veewee (using the definition).
     def package_agent
