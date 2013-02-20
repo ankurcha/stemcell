@@ -49,6 +49,13 @@ Options:
   [--agent-protocol=<agent_protocol_version>]  # Bosh Agent Protocol Version being installed
   [--iso=<iso file path>]                      # Path to the iso file to use
   [--iso-md5=<MD5 of iso file>]                # MD5 of the ISO
+  [--gui=With GUI]                             # Run virtualbox headless
+```
+
+In case of a redhat installation, the following additional options are available
+```
+  [--rhn-user=<rhn username>]                  # Redhat Network Username
+  [--rhn-pass=<rhn password>]                  # Redhat Network Password
 ```
 
 ## TODO
