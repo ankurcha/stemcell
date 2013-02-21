@@ -37,6 +37,8 @@ module StemCellBuilderCLI
                                   :desc => "Run virtualbox headless",
                                   :type => :boolean,
                                   :default => false
+    class_option :definitions_dir,:banner => "Path to defintions",
+                                  :desc => "Absolute path to the definitions directory to use instead of the built in ones"
 
     desc "ubuntu", "Build a new ubuntu stemcell"
     def ubuntu
@@ -57,11 +59,6 @@ module StemCellBuilderCLI
     desc "centos", "Build a new centos stemcell"
     def centos
       Bosh::Agent::StemCell::CentosBuilder.new(options.dup).run
-    end
-
-    desc "noop", "Build a new noop stemcell [this is good for testing only]"
-    def noop
-      Bosh::Agent::StemCell::NoOpBuilder.new(options.dup).run
     end
 
   end

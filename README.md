@@ -34,7 +34,6 @@ The `stemcell build` command gives the following options
 Tasks:
   stemcell build centos          # Build a new redhat stemcell
   stemcell build help [COMMAND]  # Describe subcommands or one specific subcommand
-  stemcell build noop            # Build a new noop stemcell [this is good for testing only]
   stemcell build redhat          # Build a new redhat stemcell
   stemcell build ubuntu          # Build a new ubuntu stemcell
 

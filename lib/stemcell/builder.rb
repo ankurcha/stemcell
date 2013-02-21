@@ -59,6 +59,7 @@ module Bosh::Agent::StemCell
       @iso = opts[:iso]
       @iso_md5 = opts[:iso_md5]
       @gui = opts[:gui]
+      @definitions_dir = opts[:definitions_dir]
 
       if @iso
         unless @iso_md5
@@ -285,7 +286,6 @@ private
   end
 end
 
-require 'stemcell/builders/noop'
 require 'stemcell/builders/ubuntu'
 require 'stemcell/builders/redhat'
 require 'stemcell/builders/centos'
