@@ -14,8 +14,8 @@ describe Bosh::Agent::StemCell::CentosBuilder do
   end
 
   it "Should initialize the manifest should properly" do
-    @stemcell.manifest.values_at(:cloud_properties).should_not be_nil
-    @stemcell.manifest[:cloud_properties][:root_device_name].should eq '/dev/sda1'
+    @stemcell.manifest.values_at("cloud_properties").should_not be_nil
+    @stemcell.manifest["cloud_properties"]["root_device_name"].should eq '/dev/sda1'
   end
 
   it "Should initialize default iso options properly" do
