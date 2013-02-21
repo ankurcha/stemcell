@@ -14,7 +14,7 @@ Gem::Specification.new do |gem|
   gem.license                     = "MIT"
 
   gem.files                       = `git ls-files`.split($/)
-  gem.bindir                        = "bin"
+  gem.bindir                      = "bin"
   gem.executables                 = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
   gem.test_files                  = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths               = ["lib"]
@@ -27,6 +27,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency                "thor"
   gem.add_dependency                "deep_merge"
   gem.add_dependency                "logger-colors"
+  gem.add_dependency                "kwalify"
 
   gem.add_development_dependency    "bundler"
   gem.add_development_dependency    "rake"

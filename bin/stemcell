@@ -6,7 +6,9 @@ $:.unshift File.join(__FILE__, "..", "..", "lib")
 
 require 'rubygems'
 require 'thor'
+require 'kwalify'
 require 'stemcell'
+require 'digest'
 
 module StemCellBuilderCLI
 
@@ -64,10 +66,6 @@ module StemCellBuilderCLI
 
   end
 
-  class Info < Thor
-
-  end
-
   class StemCellBuilder < Thor
 
     desc "build SUBCOMMAND ...ARGS", "Build a new stemcell"
@@ -84,6 +82,47 @@ module StemCellBuilderCLI
         if Kernel.system("tar -xzf #{file} stemcell.MF")
           puts File.open("stemcell.MF").read()
         end
+      end
+    end
+
+    desc "validate <file>", "Validate stemcell, it looks for stemcell file name <file>"
+    def validate(file)
+      raise "File #{file} does not exist." unless File.exists? file
+      file = File.expand_path file
+      is_ok = true
+      dir = Dir.mktmpdir
+      Dir.chdir(dir) do
+        puts "Validating #{File.basename(file)} ... "
+        if Kernel.system("tar -xzf #{file}")
+          schema = YAML.load_file(File.join(File.dirname(__FILE__), "..", "schema", "stemcell_mf_schema.yaml"))
+          validator = Kwalify::Validator.new(schema)
+          stemcell_mf = YAML.load_file("stemcell.MF")
+          error_list = validator.validate(stemcell_mf)
+          if error_list.empty?
+            puts "stemcell.MF schema \t[OK]"
+          else
+            puts "stemcell.MF schema \t[FAIL]"
+            error_list.each do |error|     # error is instance of Kwalify::ValidationError
+              puts "Error: [#{error.path}] #{error.message}"
+            end
+            is_ok = false
+          end
+          if stemcell_mf && stemcell_mf["sha1"]
+            image_sha1 = Digest::SHA1.file("image").hexdigest
+            if image_sha1 == stemcell_mf["sha1"]
+              puts "Image SHA       \t[OK]"
+            else
+              puts "Image SHA       \t[FAIL]"
+              puts "Error: SHA1 of the image does not match the one given in stemcell.MF - Expected: #{stemcell_mf["sha1"]} Actual: #{image_sha1}"
+              is_ok = false
+            end
+          end
+        end
+      end
+      if is_ok
+        puts "Stemcell: #{file} \t[OK]"
+      else
+        puts "Stemcell: #{file} \t[FAIL]"
       end
     end
 

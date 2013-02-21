@@ -1,0 +1,30 @@
+type: map
+mapping:
+  "name":
+    type: str
+    required: yes
+  "version":
+    type: str
+    required: yes
+  "bosh_protocol":
+    type: int
+    required: yes
+  "sha1":
+    type: str
+    required: no
+  "cloud_properties":
+    type: map
+    required: yes
+    mapping:
+      "root_device_name":
+        type: str
+        required: no
+        default: "/dev/sda1"
+      "architecture":
+              type: str
+              enum: [x86_64, i386]
+              required: no
+      "infrastructure":
+              type: str
+              enum: [vsphere, aws, openstack]
+              required: no

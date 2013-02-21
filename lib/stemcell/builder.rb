@@ -2,7 +2,7 @@ require 'logger/colors'
 require 'veewee'
 require 'deep_merge'
 require 'erb'
-require 'digest/md5'
+require 'digest'
 
 module Bosh::Agent::StemCell
 
@@ -123,8 +123,9 @@ module Bosh::Agent::StemCell
 
     def generate_image
       Dir.chdir(@prefix) do
-        system("tar -xzf #{@name}.box", {:on_error => "Unable to unpack .box file"})
+        system("tar -xzf #@name.box", {:on_error => "Unable to unpack .box file"})
         system("tar -czf image *.vmdk *.ovf", {:on_error=>"Unable to create image file from ovf and vmdk"})
+        @image_sha1 = Digest::SHA1.file("image").hexdigest
       end
     end
 
@@ -141,13 +142,14 @@ module Bosh::Agent::StemCell
 
     def manifest
       @manifest ||= {
-        :name => @name,
-        :version => @agent_version,
-        :bosh_protocol => @bosh_protocol,
-        :cloud_properties => {
-          :root_device_name => Bosh::Agent::StemCell::DEFAULT_DEVICE_NAME,
-          :infrastructure => @infrastructure,
-          :architecture => @architecture
+        "name" => @name,
+        "version" => @agent_version,
+        "bosh_protocol" => @bosh_protocol,
+        "sha1" => @image_sha1,
+        "cloud_properties" => {
+          "root_device_name" => Bosh::Agent::StemCell::DEFAULT_DEVICE_NAME,
+          "infrastructure" => @infrastructure,
+          "architecture" => @architecture
         }
       }
     end

@@ -44,13 +44,14 @@ describe Bosh::Agent::StemCell::BaseBuilder do
 
   it "Initializes the stemcell manifest with defaults" do
     defaults = {
-        :name => 'bosh-stemcell',
-        :version => Bosh::Agent::VERSION,
-        :bosh_protocol => Bosh::Agent::BOSH_PROTOCOL,
-        :cloud_properties => {
-            :root_device_name => Bosh::Agent::StemCell::DEFAULT_DEVICE_NAME,
-            :infrastructure => 'vsphere',
-            :architecture => 'x86_64'
+        "name" => 'bosh-stemcell',
+        "version" => Bosh::Agent::VERSION,
+        "bosh_protocol" => Bosh::Agent::BOSH_PROTOCOL,
+        "sha1" => nil,
+        "cloud_properties" => {
+            "root_device_name" => Bosh::Agent::StemCell::DEFAULT_DEVICE_NAME,
+            "infrastructure" => 'vsphere',
+            "architecture" => 'x86_64'
         }
     }
 

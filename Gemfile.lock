@@ -3,6 +3,7 @@ PATH
   specs:
     stemcell (0.0.1)
       deep_merge
+      kwalify
       logger-colors
       thor
       vagrant
@@ -52,6 +53,7 @@ GEM
     highline (1.6.15)
     i18n (0.6.1)
     json (1.5.4)
+    kwalify (0.7.2)
     libxml-ruby (2.4.0)
     log4r (1.1.10)
     logger-colors (1.0.0)
