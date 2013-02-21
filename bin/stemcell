@@ -32,13 +32,14 @@ module StemCellBuilderCLI
     class_option :iso,            :banner => "<iso file path>",
                                   :desc => "Path to the iso file to use"
     class_option :iso_md5,        :banner => "<MD5 of iso file>",
-                                  :desc => "MD5 of the ISO"
-    class_option :gui,            :banner => "With GUI",
-                                  :desc => "Run virtualbox headless",
+                                  :desc => "<MD5 hash>"
+    class_option :gui,            :desc => "Run virtualbox headless",
                                   :type => :boolean,
                                   :default => false
-    class_option :definitions_dir,:banner => "Path to defintions",
+    class_option :definitions_dir,:banner => "<path to definitions>",
                                   :desc => "Absolute path to the definitions directory to use instead of the built in ones"
+    class_option :log_level,      :banner => "DEBUG|INFO|WARN|ERROR|FATAL",
+                                  :desc => "Level of verbosity for the logs, should match ruby logger levels: DEBUG < INFO < WARN < ERROR < FATAL"
 
     desc "ubuntu", "Build a new ubuntu stemcell"
     def ubuntu

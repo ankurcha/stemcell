@@ -48,6 +48,7 @@ module Bosh::Agent::StemCell
     #}
     def initialize(opts)
       @logger = opts[:logger] || Logger.new(STDOUT)
+      @logger.level = Logger.const_get(opts[:log_level] || "INFO")
       @name = opts[:name] || Bosh::Agent::StemCell::DEFAULT_STEMCELL_NAME
       @prefix = File.expand_path(opts[:prefix] || Dir.pwd)
       @infrastructure = opts[:infrastructure] || Bosh::Agent::StemCell::DEFAULT_INFRASTRUCTURE
