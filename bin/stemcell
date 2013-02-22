@@ -62,6 +62,11 @@ module StemCellBuilderCLI
       Bosh::Agent::StemCell::CentosBuilder.new(options.dup).run
     end
 
+    desc "micro", "Build a new ubuntu, micro bosh stemcell"
+    def micro
+      Bosh::Agent::StemCell::MicroUbuntuBuilder.new(options.dup).run
+    end
+
   end
 
   class StemCellBuilder < Thor

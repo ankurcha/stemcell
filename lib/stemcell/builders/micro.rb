@@ -12,16 +12,37 @@ module Bosh::Agent::StemCell
   # }
   class MicroUbuntuBuilder < UbuntuBuilder
 
-    # TODO: Do something that packages the things correctly
+    def type
+      "micro"
+    end
+
+    def initialize(opts)
+      @bosh_src_root = opts[:bosh_src_root] || File.expand_path("bosh", @prefix)
+      @release_manifest = opts[:release_manifest] || default_release_manifest
+      @release_tar = opts[:release_tar]
+      super(opts)
+    end
+
+    def setup
+      # Do all the usual things
+      super()
+      # Do micro bosh specific things
+      unless @release_tar
+        build_all_deps
+        @release_tar = create_release_tarball
+      end
+      FileUtils.cp @release_tar, File.join(definition_dest_dir, "_release.tgz")
+      FileUtils.cp @release_manifest, File.join(definition_dest_dir, "_release.yml")
+    end
 
     def build_all_deps
-      @logger.info "Build all bosh packages with dependencies"
+      @logger.info "Build all bosh packages with dependencies from source"
       Dir.chdir(@bosh_src_root) do
         system("bundle exec rake all:build_with_deps")
       end
     end
 
-    def release_tarball
+    def create_release_tarball
       dir = File.join(@bosh_src_root, "release")
       tar = nil
       Dir.chdir(dir) do
@@ -34,8 +55,8 @@ module Bosh::Agent::StemCell
       tar ? File.expand_path(tar) : tar
     end
 
-    def release_manifest
-      manifest = File.join(@bosh_src_root, "release", "micro","#@infrastructure.yml")
+    def default_release_manifest
+      File.join(@bosh_src_root, "release", "micro","#@infrastructure.yml")
     end
 
   end

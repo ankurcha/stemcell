@@ -290,3 +290,4 @@ end
 require 'stemcell/builders/ubuntu'
 require 'stemcell/builders/redhat'
 require 'stemcell/builders/centos'
+require 'stemcell/builders/micro'
