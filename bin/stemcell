@@ -62,6 +62,12 @@ module StemCellBuilderCLI
       Bosh::Agent::StemCell::CentosBuilder.new(options.dup).run
     end
 
+    method_option :bosh_src_root,    :banner => "<bosh_src_root>", :type => :string,
+                                     :desc => "Bosh Source path, this will be used to generate all release packages (if not specified)"
+    method_option :release_manifest, :banner => "<agent_src_path>", :type => :string,
+                                     :desc => "Micro Bosh release manifest, defaults to <bosh_src_root>/release/micro/infrastructure.yml"
+    method_option :release_tar,      :banner => "<precompiled_release_tar>", :type => :string,
+                                     :desc => "Precompiled micro Bosh release tar archive"
     desc "micro", "Build a new ubuntu, micro bosh stemcell"
     def micro
       Bosh::Agent::StemCell::MicroUbuntuBuilder.new(options.dup).run

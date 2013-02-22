@@ -38,7 +38,7 @@ module Bosh::Agent::StemCell
     def build_all_deps
       @logger.info "Build all bosh packages with dependencies from source"
       Dir.chdir(@bosh_src_root) do
-        system("bundle exec rake all:build_with_deps")
+        system "bundle exec rake all:build_with_deps"
       end
     end
 
@@ -47,7 +47,7 @@ module Bosh::Agent::StemCell
       tar = nil
       Dir.chdir(dir) do
         @logger.debug("Use #{dir}/config/microbosh_dev_template.yml as release manifest")
-        FileUtils.cp File.join("config", "microbosh_dev_template.yml"), File.join("config", "dev.yml")
+        FileUtils.cp File.join("config", "microbosh-dev-template.yml"), File.join("config", "dev.yml")
         @logger.info "Create bosh release"
         system("bosh create release --force --with-tarball") # Create release
         tar = Dir.glob("dev_releases/micro-bosh*.tgz").first()
