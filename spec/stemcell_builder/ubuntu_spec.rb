@@ -6,7 +6,7 @@ describe Bosh::Agent::StemCell::UbuntuBuilder do
   before(:each) do
     @agent_file = File.join("bosh-agent.gem")
     FileUtils.touch @agent_file
-    @stemcell = Bosh::Agent::StemCell::UbuntuBuilder.new({:agent_src_path => @agent_file})
+    @stemcell = Bosh::Agent::StemCell::UbuntuBuilder.new({:agent_src_path => @agent_file, :log_level=>'ERROR'})
   end
 
   after(:each) do
@@ -29,7 +29,7 @@ describe Bosh::Agent::StemCell::UbuntuBuilder do
   end
 
   it "Should initialize override options properly" do
-    @stemcell = Bosh::Agent::StemCell::UbuntuBuilder.new({:agent_src_path => @agent_file, :iso => "http://example.com/ubuntu.iso", :iso_md5 => "123", :iso_filename => "ubuntu.iso"})
+    @stemcell = Bosh::Agent::StemCell::UbuntuBuilder.new({:agent_src_path => @agent_file, :iso => "http://example.com/ubuntu.iso", :iso_md5 => "123", :iso_filename => "ubuntu.iso", :log_level=>'ERROR'})
     @stemcell.iso.should eq "http://example.com/ubuntu.iso"
     @stemcell.iso_md5.should eq "123"
     @stemcell.iso_filename.should eq "ubuntu.iso"

@@ -24,7 +24,7 @@ module Bosh::Agent::StemCell
       if opts[:package_compiler_tar] && File.directory?(opts[:package_compiler_tar])
         # Tar up the package
         tmpdir = Dir.mktmpdir
-        tmp_package_compiler_tar = File.join(tmpdir, "_package_compiler.tgz")
+        tmp_package_compiler_tar = File.join(tmpdir, "_package_compiler.tar")
         Dir.chdir(opts[:package_compiler_tar]) do
           system "tar -cf #{tmp_package_compiler_tar} *"
           @package_compiler_tar = tmp_package_compiler_tar
@@ -42,7 +42,7 @@ module Bosh::Agent::StemCell
     def setup
       # Do all the usual things
       super()
-      FileUtils.cp @package_compiler_tar, File.join(definition_dest_dir, "_package_compiler.tgz")
+      FileUtils.cp @package_compiler_tar, File.join(definition_dest_dir, "_package_compiler.tar")
       FileUtils.cp @release_tar, File.join(definition_dest_dir, "_release.tgz")
       FileUtils.cp @release_manifest, File.join(definition_dest_dir, "_release.yml")
     end

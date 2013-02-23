@@ -6,7 +6,7 @@ describe Bosh::Agent::StemCell::RedhatBuilder do
   before(:each) do
     @agent_file = File.join("bosh-agent.gem")
     FileUtils.touch @agent_file
-    @stemcell = Bosh::Agent::StemCell::RedhatBuilder.new({:agent_src_path => @agent_file})
+    @stemcell = Bosh::Agent::StemCell::RedhatBuilder.new({:agent_src_path => @agent_file, :log_level=>'ERROR'})
   end
 
   after(:each) do
@@ -17,14 +17,13 @@ describe Bosh::Agent::StemCell::RedhatBuilder do
     logger = Logger.new(STDOUT)
     logger.should_receive(:warn).with("Redhat Network Username is not specified")
     logger.should_receive(:warn).with("Redhat Network Password is not specified")
-    @stemcell = Bosh::Agent::StemCell::RedhatBuilder.new({:agent_src_path => @agent_file, :logger => logger})
+    @stemcell = Bosh::Agent::StemCell::RedhatBuilder.new({:agent_src_path => @agent_file, :logger => logger, :log_level=>'ERROR'})
   end
 
   it "Doesn't warn user if RHN user/password is specified" do
-    logger = Logger.new(STDOUT)
-    logger.should_not_receive(:warn).with("Redhat Network Username is not specified")
-    logger.should_not_receive(:warn).with("Redhat Network Password is not specified")
-    @stemcell = Bosh::Agent::StemCell::RedhatBuilder.new({:agent_src_path => @agent_file, :logger => logger, :rhn_user => 'rhn_username', :rhn_pass => 'rhn_password'})
+    Logger.any_instance.should_not_receive(:warn).with("Redhat Network Username is not specified")
+    Logger.any_instance.should_not_receive(:warn).with("Redhat Network Password is not specified")
+    @stemcell = Bosh::Agent::StemCell::RedhatBuilder.new({:agent_src_path => @agent_file, :rhn_user => 'rhn_username', :rhn_pass => 'rhn_password', :log_level=>'ERROR'})
   end
 
   it "Should initialize type properly" do
@@ -44,7 +43,7 @@ describe Bosh::Agent::StemCell::RedhatBuilder do
   end
 
   it "Should initialize override options properly" do
-    @stemcell = Bosh::Agent::StemCell::RedhatBuilder.new({:agent_src_path => @agent_file, :iso => "http://example.com/rhel.iso", :iso_md5 => "123", :iso_filename => "rhel.iso"})
+    @stemcell = Bosh::Agent::StemCell::RedhatBuilder.new({:agent_src_path => @agent_file, :iso => "http://example.com/rhel.iso", :iso_md5 => "123", :iso_filename => "rhel.iso", :log_level=>'ERROR'})
     @stemcell.type.should eq "redhat"
     @stemcell.iso.should eq "http://example.com/rhel.iso"
     @stemcell.iso_md5.should eq "123"

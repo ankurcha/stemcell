@@ -6,7 +6,7 @@ describe Bosh::Agent::StemCell::CentosBuilder do
   before(:each) do
     @agent_file = File.join("bosh-agent.gem")
     FileUtils.touch @agent_file
-    @stemcell = Bosh::Agent::StemCell::CentosBuilder.new({:agent_src_path => @agent_file})
+    @stemcell = Bosh::Agent::StemCell::CentosBuilder.new({:agent_src_path => @agent_file, :log_level=>'WARN'})
   end
 
   after(:each) do
@@ -25,7 +25,7 @@ describe Bosh::Agent::StemCell::CentosBuilder do
   end
 
   it "Should initialize override options properly" do
-    @stemcell = Bosh::Agent::StemCell::CentosBuilder.new({:agent_src_path => @agent_file, :iso => "http://example.com/centos.iso", :iso_md5 => "123", :iso_filename => "centos.iso"})
+    @stemcell = Bosh::Agent::StemCell::CentosBuilder.new({:agent_src_path => @agent_file, :iso => "http://example.com/centos.iso", :iso_md5 => "123", :iso_filename => "centos.iso", :log_level=>'WARN'})
     @stemcell.type.should eq "centos"
     @stemcell.iso.should eq "http://example.com/centos.iso"
     @stemcell.iso_md5.should eq "123"

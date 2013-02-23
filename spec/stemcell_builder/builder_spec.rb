@@ -53,7 +53,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
     @prefix_dir = Dir.mktmpdir
     @agent_file = File.join(@prefix_dir, "bosh_agent-#{Bosh::Agent::VERSION}.gem")
     FileUtils.touch @agent_file
-    @stemcell = TestBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file, :nogui => true})
+    @stemcell = TestBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file, :nogui => true, :log_level=>'WARN'})
   end
 
   after(:each) do
@@ -72,7 +72,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
   end
 
   it "Should initialize all override ISOs properly" do
-    @stemcell = TestBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file, :iso => "http://example.com/example.iso", :iso_md5 => "example-md5", :iso_filename => "example.iso"})
+    @stemcell = TestBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file, :iso => "http://example.com/example.iso", :iso_md5 => "example-md5", :iso_filename => "example.iso", :log_level=>'WARN'})
     @stemcell.iso.should eq "http://example.com/example.iso"
     @stemcell.iso_md5.should eq "example-md5"
     @stemcell.iso_filename.should eq "example.iso"
@@ -103,7 +103,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
   end
 
   it "Initializes the options with defaults and deep_merges the provided args" do
-    override_stemcell = TestBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file})
+    override_stemcell = TestBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file, :log_level=>'WARN'})
     override_stemcell.name.should eq "bosh-stemcell"
     override_stemcell.type.should eq "noop"
   end
@@ -115,10 +115,10 @@ describe Bosh::Agent::StemCell::BaseBuilder do
 
   it "Build VM works properly" do
     # Expectations
-    Kernel.should_receive(:system).with("veewee vbox build '#{@stemcell.name}' --force --auto --nogui").and_return(true)
-    Kernel.should_receive(:system).with("vagrant basebox export '#{@stemcell.name}' --force").and_return(true)
+    @stemcell.should_receive(:`).with("veewee vbox build '#{@stemcell.name}' --force --auto --nogui").and_return(true)
+    @stemcell.should_receive(:`).with("vagrant basebox export '#{@stemcell.name}' --force").and_return(true)
 
-    Kernel.should_receive(:system).with("veewee vbox destroy '#{@stemcell.name}' --force --nogui").and_return(true)
+    @stemcell.should_receive(:`).with("veewee vbox destroy '#{@stemcell.name}' --force --nogui").and_return(true)
 
     @stemcell.build_vm
   end
@@ -142,7 +142,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
 
   it "Should invoke the methods in the correct order (setup -> build_vm -> package_vm -> finalize)" do
 
-    @stemcell = NoOpBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file})
+    @stemcell = NoOpBuilder.new({:prefix => @prefix_dir, :agent_src_path => @agent_file, :log_level=>'WARN'})
 
     @stemcell.run # all steps completed properly
 

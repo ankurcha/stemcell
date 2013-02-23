@@ -91,7 +91,7 @@ module Bosh::Agent::StemCell
         execute_veewee_cmd "build '#@name' --force --auto #{nogui_str}", {:on_error => "Unable to build vm #@name"}
 
         @logger.info "Export built VM #@name to #@prefix"
-        system "vagrant basebox export '#@name' --force", {:on_error => "Unable to export VM #@name: vagrant basebox export '#@name'"}
+        sh "vagrant basebox export '#@name' --force", {:on_error => "Unable to export VM #@name: vagrant basebox export '#@name'"}
 
         @logger.debug "Sending veewee destroy for #@name"
         execute_veewee_cmd "destroy '#@name' --force #{nogui_str}"
@@ -125,8 +125,8 @@ module Bosh::Agent::StemCell
 
     def generate_image
       Dir.chdir(@prefix) do
-        system("tar -xzf #@name.box", {:on_error => "Unable to unpack .box file"})
-        system("tar -czf image *.vmdk *.ovf", {:on_error=>"Unable to create image file from ovf and vmdk"})
+        sh("tar -xzf #@name.box", {:on_error => "Unable to unpack .box file"})
+        sh("tar -czf image *.vmdk *.ovf", {:on_error=>"Unable to create image file from ovf and vmdk"})
         @image_sha1 = Digest::SHA1.file("image").hexdigest
       end
     end
@@ -180,7 +180,7 @@ module Bosh::Agent::StemCell
     def execute_veewee_cmd(command="", opts={})
       cmd = "veewee vbox #{command}"
       @logger.debug "Executing: #{cmd}"
-      system cmd, opts
+      sh cmd, opts
     end
 
     # Package all files specified as arguments into a tar. The output file is specified by the :target option
@@ -189,7 +189,7 @@ module Bosh::Agent::StemCell
       @logger.info "Packaging #{files_str} to #@target"
 
       Dir.chdir(@prefix) do
-        system("tar -czf #{@target} #{files_str}", {:on_error => "unable to package #{files_str} into a stemcell"})
+        sh("tar -czf #{@target} #{files_str}", {:on_error => "unable to package #{files_str} into a stemcell"})
       end
     end
 
@@ -217,15 +217,15 @@ private
       dst = File.join(definition_dest_dir, "_bosh_agent.tar")
       if File.directory? @agent_src_path
         Dir.chdir(@agent_src_path) do
-          system("bundle package && gem build bosh_agent.gemspec", {:on_error => "Unable to build Bosh Agent gem"})
+          sh("bundle package && gem build bosh_agent.gemspec", {:on_error => "Unable to build Bosh Agent gem"})
           Dir.chdir(File.join(@agent_src_path, "vendor", "cache")) do
-            system("tar -cf #{dst} *.gem", {:on_error => "Unable to package bosh gems"})
+            sh("tar -cf #{dst} *.gem", {:on_error => "Unable to package bosh gems"})
           end
-          system("tar -rf #{dst} *.gem", {:on_error => "Unable to add bosh_agent gem to #{dst}"})
+          sh("tar -rf #{dst} *.gem", {:on_error => "Unable to add bosh_agent gem to #{dst}"})
         end
       else
         Dir.chdir(File.dirname(@agent_src_path)) do
-          system("tar -cf #{dst} #@agent_src_path", {:on_error => "Unable to package bosh agent gems"})
+          sh("tar -cf #{dst} #@agent_src_path", {:on_error => "Unable to package bosh agent gems"})
         end
       end
     end
@@ -268,12 +268,12 @@ private
 
     # @param [Hash] opts Options: :silent => when set to true, it raises :on_error exception
     # @param [String] cmd Command to execute
-    def system(cmd, opts={})
+    def sh(cmd, opts={})
       unless opts[:on_error]
         opts[:on_error] = "Unable to execute: #{cmd}"
       end
-
-      Kernel.system(cmd)
+      output = %x{#{cmd}}
+      @logger.debug(output) if output
       exit_status = $?.exitstatus
 
       # raise error only if silent is not true and exit_status != 0
