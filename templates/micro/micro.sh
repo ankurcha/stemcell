@@ -3,19 +3,19 @@
 source _variables.sh
 
 blobstore_path=${bosh_app_dir}/micro_bosh/data/cache
-infrastructure=`cat /etc/infrastructure`
+infrastructure=$system_parameters_infrastructure
 agent_host=localhost
 agent_port=6969
 agent_uri=http://vcap:vcap@${agent_host}:${agent_port}
 export PATH=${bosh_app_dir}/bosh/bin:$PATH
 
 # Packages
-apt_get -y install genisoimage
+apt-get -y install genisoimage
 
 # Install package compiler
 mkdir -p /tmp/package_compiler
 pushd /tmp/package_compiler
-    cp $SRC_DIR/_package_compiler.tar /tmp/package_compiler
+    cp $SRC_DIR/_package_compiler.tar .
     tar -xvf _package_compiler.tar
     $bosh_dir/bin/gem install *.gem --no-ri --no-rdoc --local
 popd
@@ -37,12 +37,7 @@ for i in {1..10}
   done
 
 # Start compiler
-$bosh_dir/bin/package_compiler compile \ # Perform a compile
-    --cpi ${infrastructure} \            # Infrastructure that we are targeting
-    $SRC_DIR/_release.yml \              # Release manifest
-    $SRC_DIR/_release.tgz \              # Release tar
-    ${blobstore_path} \                  # Local blobstore path
-    ${agent_uri}                         # Bosh Agent URL
+$bosh_dir/bin/package_compiler --cpi ${infrastructure} compile $SRC_DIR/_release.yml $SRC_DIR/_release.tgz ${blobstore_path} ${agent_uri}
 
 kill -15 $agent_pid
 
