@@ -17,46 +17,45 @@ module Bosh::Agent::StemCell
     end
 
     def initialize(opts)
-      @bosh_src_root = opts[:bosh_src_root] || File.expand_path("bosh", @prefix)
-      @release_manifest = opts[:release_manifest] || default_release_manifest
+      #@bosh_src_root = opts[:bosh_src_root] || File.expand_path("bosh", @prefix)
+      @release_manifest = opts[:release_manifest] # || default_release_manifest
       @release_tar = opts[:release_tar]
+      # This is kind of a hack :(
+      if opts[:package_compiler_tar] && File.directory?(opts[:package_compiler_tar])
+        # Tar up the package
+        tmpdir = Dir.mktmpdir
+        tmp_package_compiler_tar = File.join(tmpdir, "_package_compiler.tgz")
+        Dir.chdir(opts[:package_compiler_tar]) do
+          system "tar -cf #{tmp_package_compiler_tar} *"
+          @package_compiler_tar = tmp_package_compiler_tar
+        end
+      else
+        @package_compiler_tar = File.expand_path(opts[:package_compiler_tar])
+      end
+
+      unless File.exists?(@release_manifest) && File.exists?(@release_tar) && File.exists?(@package_compiler_tar)
+        raise "Please confirm #@release_tar, #@release_manifest and #@package_compiler_tar exists."
+      end
       super(opts)
     end
 
     def setup
       # Do all the usual things
       super()
-      # Do micro bosh specific things
-      unless @release_tar
-        build_all_deps
-        @release_tar = create_release_tarball
-      end
+      FileUtils.cp @package_compiler_tar, File.join(definition_dest_dir, "_package_compiler.tgz")
       FileUtils.cp @release_tar, File.join(definition_dest_dir, "_release.tgz")
       FileUtils.cp @release_manifest, File.join(definition_dest_dir, "_release.yml")
     end
 
     def build_all_deps
       @logger.info "Build all bosh packages with dependencies from source"
-      Dir.chdir(@bosh_src_root) do
-        system "bundle exec rake all:build_with_deps"
-      end
+      @logger.info "Execute 'rake all:build_with_deps' in bosh/ directory"
     end
 
     def create_release_tarball
-      dir = File.join(@bosh_src_root, "release")
-      tar = nil
-      Dir.chdir(dir) do
-        @logger.debug("Use #{dir}/config/microbosh_dev_template.yml as release manifest")
-        FileUtils.cp File.join("config", "microbosh-dev-template.yml"), File.join("config", "dev.yml")
-        @logger.info "Create bosh release"
-        system("bosh create release --force --with-tarball") # Create release
-        tar = Dir.glob("dev_releases/micro-bosh*.tgz").first()
-      end
-      tar ? File.expand_path(tar) : tar
-    end
-
-    def default_release_manifest
-      File.join(@bosh_src_root, "release", "micro","#@infrastructure.yml")
+      @logger.info("Copy bosh/release/config/microbosh-dev-template.yml to bosh/release/config/dev.yml")
+      @logger.info("Then execute 'bosh create release --force --with-tarball'")
+      @logger.info("The release tar will be in bosh/release/dev_releases/micro-bosh*.tgz")
     end
 
   end
