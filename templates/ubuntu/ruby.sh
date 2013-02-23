@@ -5,11 +5,12 @@ source _variables.sh
 ### stage bosh_ruby
 apt-get -y update
 apt-get -y autoremove
-apt-get -y install build-essential zlib1g-dev libssl-dev libxml2-dev libxslt-dev libreadline6-dev libyaml-dev
+apt-get -y install build-essential zlib1g-dev libssl-dev libxml2-dev libxslt-dev libreadline6-dev libyaml-dev libffi-dev
 
 # install ruby
 pushd /tmp
 	if [ ! -f "$bosh_dir/bin/ruby" ]
+	then
 	    [ ! -f "ruby-1.9.3-p385.tar.gz" ] && wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p385.tar.gz
 		tar zxf ruby-1.9.3-p385.tar.gz
 		cd ruby-1.9.3-p385
@@ -20,6 +21,7 @@ popd
 # Install rubygems
 pushd /tmp
 	if [ ! -f "$bosh_dir/bin/gem" ]
+	then
 		[ ! -f "rubygems-1.8.24.tgz" ] && wget http://production.cf.rubygems.org/rubygems/rubygems-1.8.24.tgz
 		tar zxf rubygems-1.8.24.tgz
 		cd rubygems-1.8.24
