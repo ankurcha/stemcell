@@ -128,7 +128,7 @@ module Bosh::Agent::StemCell
       Dir.chdir(@prefix) do
         system("tar -czf #{image_path} image-disk1.vmdk image.ovf", {:on_error=>"Unable to create image file from ovf and vmdk"})
         FileUtils.rm %w(image.ovf image-disk1.vmdk)
-        @image_sha1 = Digest::SHA1.file("image").hexdigest
+        @image_sha1 = Digest::SHA1.file(image_path).hexdigest
       end
       image_path
     end
@@ -198,7 +198,7 @@ module Bosh::Agent::StemCell
       Dir.mktmpdir {|tmpdir|
         @stemcell_files.each {|file| FileUtils.cp(file, tmpdir) }
         Dir.chdir(tmpdir) do
-          @logger.debug("Package #@stemcell_files to #@target ...")
+          @logger.info("Package #@stemcell_files to #@target ...")
           system("tar -czf #@target *", {:on_error => "unable to package #@stemcell_files into a stemcell"})
         end
       }
