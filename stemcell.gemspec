@@ -23,7 +23,6 @@ Gem::Specification.new do |gem|
 
   # Dependencies
   gem.add_dependency                "veewee"
-  gem.add_dependency                "vagrant"
   gem.add_dependency                "thor"
   gem.add_dependency                "deep_merge"
   gem.add_dependency                "logger-colors"

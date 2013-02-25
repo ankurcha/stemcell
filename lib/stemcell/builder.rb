@@ -61,6 +61,7 @@ module Bosh::Agent::StemCell
       @iso_md5 = opts[:iso_md5]
       @gui = opts[:gui]
       @definitions_dir = opts[:definitions_dir]
+      @stemcell_files = [] # List of files to be packaged into the stemcell
 
       if @iso
         unless @iso_md5
@@ -91,7 +92,7 @@ module Bosh::Agent::StemCell
         execute_veewee_cmd "build '#@name' --force --auto #{nogui_str}", {:on_error => "Unable to build vm #@name"}
 
         @logger.info "Export built VM #@name to #@prefix"
-        system "vagrant basebox export '#@name' --force", {:on_error => "Unable to export VM #@name: vagrant basebox export '#@name'"}
+        system "VBoxManage export '#@name' --output image.ovf", {:on_error => "Unable to export VM #@name"}
 
         @logger.debug "Sending veewee destroy for #@name"
         execute_veewee_cmd "destroy '#@name' --force #{nogui_str}"
@@ -109,11 +110,9 @@ module Bosh::Agent::StemCell
 
     # Packages the stemcell contents (defined as the array of file path argument)
     def package_stemcell
-      generate_image
-      generate_manifest
-      generate_pkg_list
-
-      package_files "image", "stemcell.MF", "stemcell_dpkg_l.txt"
+      @stemcell_files << generate_image << generate_manifest << generate_pkg_list
+      # package up files
+      package_files
     end
 
     def generate_manifest
@@ -121,18 +120,23 @@ module Bosh::Agent::StemCell
       File.open(stemcell_mf_path, "w") do |f|
         f.write(manifest.to_yaml)
       end
+      stemcell_mf_path
     end
 
     def generate_image
+      image_path = File.join @prefix, "image"
       Dir.chdir(@prefix) do
-        system("tar -xzf #@name.box", {:on_error => "Unable to unpack .box file"})
-        system("tar -czf image *.vmdk *.ovf", {:on_error=>"Unable to create image file from ovf and vmdk"})
+        system("tar -czf #{image_path} image-disk1.vmdk image.ovf", {:on_error=>"Unable to create image file from ovf and vmdk"})
+        FileUtils.rm %w(image.ovf image-disk1.vmdk)
         @image_sha1 = Digest::SHA1.file("image").hexdigest
       end
+      image_path
     end
 
     def generate_pkg_list
-      FileUtils.touch File.join(@prefix, "stemcell_dpkg_l.txt")
+      package_list_file = File.join(@prefix, "stemcell_dpkg_l.txt")
+      FileUtils.touch package_list_file
+      package_list_file
     end
 
     # Main execution method that sets up the directory, builds the VM and packages everything into a stemcell
@@ -140,6 +144,12 @@ module Bosh::Agent::StemCell
       setup
       build_vm
       package_stemcell
+      cleanup
+      @target
+    end
+
+    def cleanup
+      FileUtils.rm_rf @stemcell_files
     end
 
     def manifest
@@ -184,13 +194,15 @@ module Bosh::Agent::StemCell
     end
 
     # Package all files specified as arguments into a tar. The output file is specified by the :target option
-    def package_files(*files)
-      files_str = files.join(" ")
-      @logger.info "Packaging #{files_str} to #@target"
-
-      Dir.chdir(@prefix) do
-        system("tar -czf #{@target} #{files_str}", {:on_error => "unable to package #{files_str} into a stemcell"})
-      end
+    def package_files
+      Dir.mktmpdir {|tmpdir|
+        @stemcell_files.each {|file| FileUtils.cp(file, tmpdir) }
+        Dir.chdir(tmpdir) do
+          @logger.debug("Package #@stemcell_files to #@target ...")
+          system("tar -czf #@target *", {:on_error => "unable to package #@stemcell_files into a stemcell"})
+        end
+      }
+      @target
     end
 
     def sanity_check
