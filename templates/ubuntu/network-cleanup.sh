@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 # Removing leftover leases and persistent rules
 echo "cleaning up dhcp leases"

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 source _variables.sh
 ### stage system_open_vm_tools

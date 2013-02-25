@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 #import helpers scripts
 source _variables.sh
