@@ -3,6 +3,7 @@ require 'veewee'
 require 'deep_merge'
 require 'erb'
 require 'digest'
+require 'securerandom'
 
 module Bosh::Agent::StemCell
 
@@ -15,6 +16,7 @@ module Bosh::Agent::StemCell
     attr_accessor :prefix, :target
     attr_accessor :iso, :iso_md5, :iso_filename
     attr_accessor :logger
+    attr_accessor :vm_name
 
     # Stemcell builders are initialized with a manifest and a set of options. The options provided are merged with the
     # defaults to allow the end user/developer to specify only the ones that they wish to change and fallback to the defaults.
@@ -47,6 +49,7 @@ module Bosh::Agent::StemCell
     #  }
     #}
     def initialize(opts)
+      @vm_name = SecureRandom.uuid
       @logger = opts[:logger] || Logger.new(STDOUT)
       @logger.level = Logger.const_get(opts[:log_level] || "INFO")
       @name = opts[:name] || Bosh::Agent::StemCell::DEFAULT_STEMCELL_NAME
@@ -89,13 +92,13 @@ module Bosh::Agent::StemCell
         @logger.info "Building vm #@name"
         nogui_str = gui? ? "" : "--nogui"
 
-        execute_veewee_cmd "build '#@name' --force --auto #{nogui_str}", {:on_error => "Unable to build vm #@name"}
+        execute_veewee_cmd "build '#@vm_name' --force --auto #{nogui_str}", {:on_error => "Unable to build vm #@name"}
 
         @logger.info "Export built VM #@name to #@prefix"
-        system "VBoxManage export '#@name' --output image.ovf", {:on_error => "Unable to export VM #@name"}
+        system "VBoxManage export '#@vm_name' --output image.ovf", {:on_error => "Unable to export VM #@name"}
 
         @logger.debug "Sending veewee destroy for #@name"
-        execute_veewee_cmd "destroy '#@name' --force #{nogui_str}"
+        execute_veewee_cmd "destroy '#@vm_name' --force #{nogui_str}"
       end
 
     end
@@ -261,7 +264,7 @@ private
     end
 
     def definition_dest_dir
-      @definition_dest_dir ||= File.join(@prefix, "definitions", @name)
+      @definition_dest_dir ||= File.join(@prefix, "definitions", @vm_name)
     end
 
     def gui?

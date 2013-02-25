@@ -121,10 +121,10 @@ describe Bosh::Agent::StemCell::BaseBuilder do
 
   it "Build VM works properly" do
     # Expectations
-    Kernel.should_receive(:system).with("veewee vbox build '#{@stemcell.name}' --force --auto --nogui").and_return(true)
-    Kernel.should_receive(:system).with("VBoxManage export '#{@stemcell.name}' --output image.ovf").and_return(true)
+    Kernel.should_receive(:system).with("veewee vbox build '#{@stemcell.vm_name}' --force --auto --nogui").and_return(true)
+    Kernel.should_receive(:system).with("VBoxManage export '#{@stemcell.vm_name}' --output image.ovf").and_return(true)
 
-    Kernel.should_receive(:system).with("veewee vbox destroy '#{@stemcell.name}' --force --nogui").and_return(true)
+    Kernel.should_receive(:system).with("veewee vbox destroy '#{@stemcell.vm_name}' --force --nogui").and_return(true)
 
     @stemcell.build_vm
   end
@@ -137,12 +137,12 @@ describe Bosh::Agent::StemCell::BaseBuilder do
   it "Compiles all the erb files as a part of the setup" do
     Dir.chdir(@prefix_dir) do
       @stemcell.setup
-      filename = File.join(@prefix_dir, "definitions", @stemcell.name, "erbtest.txt")
-      regular_filename = File.join(@prefix_dir, "definitions", @stemcell.name, "test.txt")
+      filename = File.join(@prefix_dir, "definitions", @stemcell.vm_name, "erbtest.txt")
+      regular_filename = File.join(@prefix_dir, "definitions", @stemcell.vm_name, "test.txt")
       File.exists?(filename).should eq true
       File.exists?(regular_filename).should eq true
-      File.read(File.join(@prefix_dir, "definitions", @stemcell.name, "erbtest.txt")).should eq @stemcell.name
-      File.read(File.join(@prefix_dir, "definitions", @stemcell.name, "test.txt")).should eq "## This is a test ##"
+      File.read(File.join(@prefix_dir, "definitions", @stemcell.vm_name, "erbtest.txt")).should eq @stemcell.name
+      File.read(File.join(@prefix_dir, "definitions", @stemcell.vm_name, "test.txt")).should eq "## This is a test ##"
     end
   end
 
