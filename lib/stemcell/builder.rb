@@ -95,7 +95,7 @@ module Bosh::Agent::StemCell
         execute_veewee_cmd "build '#@vm_name' --force --auto #{nogui_str}", {:on_error => "Unable to build vm #@name"}
 
         @logger.info "Export built VM #@name to #@prefix"
-        sh "vagrant basebox export '#@vm_name' --force", {:on_error => "Unable to export VM #@name: vagrant basebox export '#@name'"}
+        sh "vagrant basebox export '#@vm_name' --force", {:on_error => "Unable to export VM #@name: vagrant basebox export '#@vm_name'"}
 
         @logger.debug "Sending veewee destroy for #@name"
         execute_veewee_cmd "destroy '#@vm_name' --force #{nogui_str}"
@@ -226,6 +226,24 @@ module Bosh::Agent::StemCell
       raise "Definition for '#{type}' does not exist at path '#{definition_dir}'" unless Dir.exist? definition_dir
     end
 
+    # @param [Hash] opts Options: :silent => when set to true, it raises :on_error exception
+    # @param [String] cmd Command to execute
+    def sh(cmd, opts={})
+      unless opts[:on_error]
+        opts[:on_error] = "Unable to execute: #{cmd}"
+      end
+      output = Kernel.system(cmd)
+      @logger.debug(output) if output
+      exit_status = $?.exitstatus
+
+      # raise error only if silent is not true and exit_status != 0
+      if exit_status != 0
+        raise opts[:on_error] unless opts[:silent]
+      end
+
+      exit_status
+    end
+
 private
     # Packages the agent into a bosh_agent gem and copies it over to definition_dest_dir
     # so that it can be used as a part of the VM building process by veewee (using the definition).
@@ -234,7 +252,7 @@ private
       dst = File.join(definition_dest_dir, "_bosh_agent.tar")
       if File.directory? @agent_src_path
         Dir.chdir(@agent_src_path) do
-          system("bundle package > /dev/null 2>&1 && gem build bosh_agent.gemspec > /dev/null 2>&1", {:on_error => "Unable to build Bosh Agent gem"})
+          sh("bundle package > /dev/null 2>&1 && gem build bosh_agent.gemspec > /dev/null 2>&1", {:on_error => "Unable to build Bosh Agent gem"})
           Dir.chdir(File.join(@agent_src_path, "vendor", "cache")) do
             sh("tar -cf #{dst} *.gem", {:on_error => "Unable to package bosh gems"})
           end
@@ -266,7 +284,7 @@ private
     end
 
     def definition_dest_dir
-      @definition_dest_dir ||= File.join(@prefix, "definitions", @vm_name)
+      File.expand_path(@definition_dest_dir ||= File.join(@prefix, "definitions", @vm_name))
     end
 
     def gui?
@@ -281,24 +299,6 @@ private
         f.write(ERB.new(File.read(File.expand_path(erb_file))).result(binding))
         File.delete erb_file
       }
-    end
-
-    # @param [Hash] opts Options: :silent => when set to true, it raises :on_error exception
-    # @param [String] cmd Command to execute
-    def sh(cmd, opts={})
-      unless opts[:on_error]
-        opts[:on_error] = "Unable to execute: #{cmd}"
-      end
-      output = %x{#{cmd}}
-      @logger.debug(output) if output
-      exit_status = $?.exitstatus
-
-      # raise error only if silent is not true and exit_status != 0
-      if exit_status != 0
-        raise opts[:on_error] unless opts[:silent]
-      end
-
-      exit_status
     end
 
   end

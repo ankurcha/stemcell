@@ -121,16 +121,10 @@ describe Bosh::Agent::StemCell::BaseBuilder do
   end
 
   it "Build VM works properly" do
-    # Expectations
-    @stemcell.should_receive(:`).with("veewee vbox build '#{@stemcell.vm_name}' --force --auto --nogui").and_return(true)
-    @stemcell.should_receive(:`).with("vagrant basebox export '#{@stemcell.vm_name}' --force").and_return(true)
+    Kernel.should_receive(:system).with("veewee vbox build '#{@stemcell.vm_name}' --force --auto --nogui").and_return(true)
+    Kernel.should_receive(:system).with("vagrant basebox export '#{@stemcell.vm_name}' --force").and_return(true)
 
-    @stemcell.should_receive(:`).with("veewee vbox destroy '#{@stemcell.vm_name}' --force --nogui").and_return(true)
-#=======
-#    Kernel.should_receive(:system).with("veewee vbox build '#{@stemcell.vm_name}' --force --auto --nogui").and_return(true)
-#    Kernel.should_receive(:system).with("vagrant basebox export '#{@stemcell.vm_name}' --force").and_return(true)
-#
-#    Kernel.should_receive(:system).with("veewee vbox destroy '#{@stemcell.vm_name}' --force --nogui").and_return(true)
+    Kernel.should_receive(:system).with("veewee vbox destroy '#{@stemcell.vm_name}' --force --nogui").and_return(true)
 
     @stemcell.build_vm
   end

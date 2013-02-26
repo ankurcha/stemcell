@@ -26,7 +26,7 @@ module Bosh::Agent::StemCell
         tmpdir = Dir.mktmpdir
         tmp_package_compiler_tar = File.join(tmpdir, "_package_compiler.tar")
         Dir.chdir(opts[:package_compiler_tar]) do
-          system "tar -cf #{tmp_package_compiler_tar} *"
+          sh "tar -cf #{tmp_package_compiler_tar} *"
           @package_compiler_tar = tmp_package_compiler_tar
         end
       else
