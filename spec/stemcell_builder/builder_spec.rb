@@ -164,16 +164,14 @@ describe Bosh::Agent::StemCell::BaseBuilder do
   end
 
   it "Packages the stemcell contents correctly" do
-    require 'yaml'
-
-    Dir.chdir(@prefix_dir) {
+    Dir.chdir(@prefix_dir) do
       # Create the box file
       FileUtils.touch "image-disk1.vmdk"
       FileUtils.touch "image.ovf"
       FileUtils.touch "Vagrantfile" # Unused
 
       system "tar -cf #{@stemcell.vm_name}.box image-disk1.vmdk image.ovf Vagrantfile"
-    }
+    end
 
     @stemcell.package_stemcell()
     target = File.expand_path(@stemcell.target)
