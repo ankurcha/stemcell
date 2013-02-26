@@ -170,7 +170,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
       FileUtils.touch "image.ovf"
       FileUtils.touch "Vagrantfile" # Unused
 
-      system "tar -cf #{@stemcell.vm_name}.box image-disk1.vmdk image.ovf Vagrantfile"
+      system "tar -cf #{File.join(@prefix_dir, @stemcell.vm_name)}.box image-disk1.vmdk image.ovf Vagrantfile"
     end
 
     @stemcell.package_stemcell()
