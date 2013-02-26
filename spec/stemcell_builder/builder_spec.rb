@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'yaml'
 
 describe Bosh::Agent::StemCell::BaseBuilder do
 
