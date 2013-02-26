@@ -129,8 +129,8 @@ module Bosh::Agent::StemCell
     def generate_image
       image_path = File.join @prefix, "image"
       Dir.chdir(@prefix) do
-        sh("tar -xzf #@vm_name.box", {:on_error => "Unable to unpack .box file"})
-        sh("tar -czf #{image_path} *.vmdk *.ovf", {:on_error=>"Unable to create image file from ovf and vmdk"})
+        sh("tar -xzf #@vm_name.box > /dev/null 2>&1", {:on_error => "Unable to unpack .box file"})
+        sh("tar -czf #{image_path} *.vmdk *.ovf > /dev/null 2>&1", {:on_error=>"Unable to create image file from ovf and vmdk"})
         FileUtils.rm [Dir.glob('*.box'), Dir.glob('*.vmdk'), Dir.glob('*.ovf'), "Vagrantfile"]
         @image_sha1 = Digest::SHA1.file(image_path).hexdigest
       end
@@ -204,7 +204,7 @@ module Bosh::Agent::StemCell
         @stemcell_files.each {|file| FileUtils.cp(file, tmpdir) }
         Dir.chdir(tmpdir) do
           @logger.info("Package #@stemcell_files to #@target ...")
-          sh "tar -czf #@target *", {:on_error => "unable to package #@stemcell_files into a stemcell"}
+          sh "tar -czf #@target * > /dev/null 2>&1", {:on_error => "unable to package #@stemcell_files into a stemcell"}
         end
       }
       @target
@@ -254,13 +254,13 @@ private
         Dir.chdir(@agent_src_path) do
           sh("bundle package > /dev/null 2>&1 && gem build bosh_agent.gemspec > /dev/null 2>&1", {:on_error => "Unable to build Bosh Agent gem"})
           Dir.chdir(File.join(@agent_src_path, "vendor", "cache")) do
-            sh("tar -cf #{dst} *.gem", {:on_error => "Unable to package bosh gems"})
+            sh("tar -cf #{dst} *.gem > /dev/null 2>&1", {:on_error => "Unable to package bosh gems"})
           end
-          sh("tar -rf #{dst} *.gem", {:on_error => "Unable to add bosh_agent gem to #{dst}"})
+          sh("tar -rf #{dst} *.gem > /dev/null 2>&1", {:on_error => "Unable to add bosh_agent gem to #{dst}"})
         end
       else
         Dir.chdir(File.dirname(@agent_src_path)) do
-          sh("tar -cf #{dst} #@agent_src_path", {:on_error => "Unable to package bosh agent gems"})
+          sh("tar -cf #{dst} #@agent_src_path > /dev/null 2>&1", {:on_error => "Unable to package bosh agent gems"})
         end
       end
     end
