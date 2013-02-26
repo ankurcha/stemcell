@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 ### stage bosh_harden
 # remove setuid binaries - except su/sudo (sudoedit is hardlinked)

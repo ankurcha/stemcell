@@ -6,7 +6,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
 
   class NoOpBuilder < Bosh::Agent::StemCell::BaseBuilder
 
-    attr_reader :build_vm_run, :package_stemcell_run, :setup_run
+    attr_reader :build_vm_run, :package_stemcell_run, :setup_run, :cleanup_run
 
     def type
       "noop"
@@ -33,6 +33,12 @@ describe Bosh::Agent::StemCell::BaseBuilder do
       @logger.info "Setting up stemcell creation process."
       @counter += 1
       @setup_run = @counter
+    end
+
+    def cleanup
+      @logger.info "Perform cleanup"
+      @counter += 1
+      @cleanup_run = @counter
     end
 
     def init_default_iso
@@ -115,10 +121,15 @@ describe Bosh::Agent::StemCell::BaseBuilder do
 
   it "Build VM works properly" do
     # Expectations
-    @stemcell.should_receive(:`).with("veewee vbox build '#{@stemcell.name}' --force --auto --nogui").and_return(true)
-    @stemcell.should_receive(:`).with("vagrant basebox export '#{@stemcell.name}' --force").and_return(true)
+    @stemcell.should_receive(:`).with("veewee vbox build '#{@stemcell.vm_name}' --force --auto --nogui").and_return(true)
+    @stemcell.should_receive(:`).with("vagrant basebox export '#{@stemcell.vm_name}' --force").and_return(true)
 
-    @stemcell.should_receive(:`).with("veewee vbox destroy '#{@stemcell.name}' --force --nogui").and_return(true)
+    @stemcell.should_receive(:`).with("veewee vbox destroy '#{@stemcell.vm_name}' --force --nogui").and_return(true)
+#=======
+#    Kernel.should_receive(:system).with("veewee vbox build '#{@stemcell.vm_name}' --force --auto --nogui").and_return(true)
+#    Kernel.should_receive(:system).with("vagrant basebox export '#{@stemcell.vm_name}' --force").and_return(true)
+#
+#    Kernel.should_receive(:system).with("veewee vbox destroy '#{@stemcell.vm_name}' --force --nogui").and_return(true)
 
     @stemcell.build_vm
   end
@@ -131,12 +142,12 @@ describe Bosh::Agent::StemCell::BaseBuilder do
   it "Compiles all the erb files as a part of the setup" do
     Dir.chdir(@prefix_dir) do
       @stemcell.setup
-      filename = File.join(@prefix_dir, "definitions", @stemcell.name, "erbtest.txt")
-      regular_filename = File.join(@prefix_dir, "definitions", @stemcell.name, "test.txt")
+      filename = File.join(@prefix_dir, "definitions", @stemcell.vm_name, "erbtest.txt")
+      regular_filename = File.join(@prefix_dir, "definitions", @stemcell.vm_name, "test.txt")
       File.exists?(filename).should eq true
       File.exists?(regular_filename).should eq true
-      File.read(File.join(@prefix_dir, "definitions", @stemcell.name, "erbtest.txt")).should eq @stemcell.name
-      File.read(File.join(@prefix_dir, "definitions", @stemcell.name, "test.txt")).should eq "## This is a test ##"
+      File.read(File.join(@prefix_dir, "definitions", @stemcell.vm_name, "erbtest.txt")).should eq @stemcell.name
+      File.read(File.join(@prefix_dir, "definitions", @stemcell.vm_name, "test.txt")).should eq "## This is a test ##"
     end
   end
 
@@ -149,6 +160,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
     @stemcell.setup_run.should eq 1
     @stemcell.build_vm_run.should eq 2
     @stemcell.package_stemcell_run.should eq 3
+    @stemcell.cleanup_run.should eq 4
   end
 
   it "Packages the stemcell contents correctly" do
@@ -156,10 +168,11 @@ describe Bosh::Agent::StemCell::BaseBuilder do
 
     Dir.chdir(@prefix_dir) {
       # Create the box file
-      FileUtils.touch "box-disk1.vmdk"
-      FileUtils.touch "box.ovf"
+      FileUtils.touch "image-disk1.vmdk"
+      FileUtils.touch "image.ovf"
       FileUtils.touch "Vagrantfile" # Unused
-      system "tar -czf #{@stemcell.name}.box box-disk1.vmdk box.ovf Vagrantfile"
+
+      system "tar -cf #{@stemcell.vm_name}.box image-disk1.vmdk image.ovf Vagrantfile"
     }
 
     @stemcell.package_stemcell()
@@ -167,9 +180,9 @@ describe Bosh::Agent::StemCell::BaseBuilder do
 
     File.exists?(target).should eq true # target is created
 
-    Dir.mktmpdir { |tmpdir|
-      system "tar -C #{tmpdir} -xzf #{target} stemcell.MF"
-      YAML.load_file(File.expand_path("stemcell.MF", tmpdir)).should eq @stemcell.manifest
+    Dir.chdir(Dir.mktmpdir) {
+      system "tar -xzf #{target}"
+      YAML.load_file("stemcell.MF").should eq @stemcell.manifest
     }
   end
 

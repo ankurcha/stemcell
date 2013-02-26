@@ -2,7 +2,8 @@ require 'logger/colors'
 require 'veewee'
 require 'deep_merge'
 require 'erb'
-require 'digest'
+require 'securerandom'
+require 'digest/sha1'
 
 module Bosh::Agent::StemCell
 
@@ -15,6 +16,7 @@ module Bosh::Agent::StemCell
     attr_accessor :prefix, :target
     attr_accessor :iso, :iso_md5, :iso_filename
     attr_accessor :logger
+    attr_accessor :vm_name
 
     # Stemcell builders are initialized with a manifest and a set of options. The options provided are merged with the
     # defaults to allow the end user/developer to specify only the ones that they wish to change and fallback to the defaults.
@@ -50,6 +52,7 @@ module Bosh::Agent::StemCell
       @logger = opts[:logger] || Logger.new(STDOUT)
       @logger.level = Logger.const_get(opts[:log_level] || "INFO")
       @name = opts[:name] || Bosh::Agent::StemCell::DEFAULT_STEMCELL_NAME
+      @vm_name = opts[:name] || SecureRandom.uuid
       @prefix = File.expand_path(opts[:prefix] || Dir.pwd)
       @infrastructure = opts[:infrastructure] || Bosh::Agent::StemCell::DEFAULT_INFRASTRUCTURE
       @architecture = opts[:architecture] || Bosh::Agent::StemCell::DEFAULT_ARCHITECTURE
@@ -61,6 +64,7 @@ module Bosh::Agent::StemCell
       @iso_md5 = opts[:iso_md5]
       @gui = opts[:gui]
       @definitions_dir = opts[:definitions_dir]
+      @stemcell_files = [] # List of files to be packaged into the stemcell
 
       if @iso
         unless @iso_md5
@@ -88,13 +92,13 @@ module Bosh::Agent::StemCell
         @logger.info "Building vm #@name"
         nogui_str = gui? ? "" : "--nogui"
 
-        execute_veewee_cmd "build '#@name' --force --auto #{nogui_str}", {:on_error => "Unable to build vm #@name"}
+        execute_veewee_cmd "build '#@vm_name' --force --auto #{nogui_str}", {:on_error => "Unable to build vm #@name"}
 
         @logger.info "Export built VM #@name to #@prefix"
-        sh "vagrant basebox export '#@name' --force", {:on_error => "Unable to export VM #@name: vagrant basebox export '#@name'"}
+        sh "vagrant basebox export '#@vm_name' --force", {:on_error => "Unable to export VM #@name: vagrant basebox export '#@name'"}
 
         @logger.debug "Sending veewee destroy for #@name"
-        execute_veewee_cmd "destroy '#@name' --force #{nogui_str}"
+        execute_veewee_cmd "destroy '#@vm_name' --force #{nogui_str}"
       end
 
     end
@@ -109,11 +113,9 @@ module Bosh::Agent::StemCell
 
     # Packages the stemcell contents (defined as the array of file path argument)
     def package_stemcell
-      generate_image
-      generate_manifest
-      generate_pkg_list
-
-      package_files "image", "stemcell.MF", "stemcell_dpkg_l.txt"
+      @stemcell_files << generate_image << generate_manifest << generate_pkg_list
+      # package up files
+      package_files
     end
 
     def generate_manifest
@@ -121,18 +123,24 @@ module Bosh::Agent::StemCell
       File.open(stemcell_mf_path, "w") do |f|
         f.write(manifest.to_yaml)
       end
+      stemcell_mf_path
     end
 
     def generate_image
+      image_path = File.join @prefix, "image"
       Dir.chdir(@prefix) do
-        sh("tar -xzf #@name.box", {:on_error => "Unable to unpack .box file"})
-        sh("tar -czf image *.vmdk *.ovf", {:on_error=>"Unable to create image file from ovf and vmdk"})
-        @image_sha1 = Digest::SHA1.file("image").hexdigest
+        sh("tar -xzf #@vm_name.box", {:on_error => "Unable to unpack .box file"})
+        sh("tar -czf #{image_path} *.vmdk *.ovf", {:on_error=>"Unable to create image file from ovf and vmdk"})
+        FileUtils.rm [Dir.glob('*.box'), Dir.glob('*.vmdk'), Dir.glob('*.ovf'), "Vagrantfile"]
+        @image_sha1 = Digest::SHA1.file(image_path).hexdigest
       end
+      image_path
     end
 
     def generate_pkg_list
-      FileUtils.touch File.join(@prefix, "stemcell_dpkg_l.txt")
+      package_list_file = File.join(@prefix, "stemcell_dpkg_l.txt")
+      FileUtils.touch package_list_file
+      package_list_file
     end
 
     # Main execution method that sets up the directory, builds the VM and packages everything into a stemcell
@@ -140,6 +148,13 @@ module Bosh::Agent::StemCell
       setup
       build_vm
       package_stemcell
+      cleanup
+      @target
+    end
+
+    def cleanup
+      @logger.info "Cleaning up files: #@stemcell_files"
+      FileUtils.rm_rf @stemcell_files
     end
 
     def manifest
@@ -184,13 +199,15 @@ module Bosh::Agent::StemCell
     end
 
     # Package all files specified as arguments into a tar. The output file is specified by the :target option
-    def package_files(*files)
-      files_str = files.join(" ")
-      @logger.info "Packaging #{files_str} to #@target"
-
-      Dir.chdir(@prefix) do
-        sh("tar -czf #{@target} #{files_str}", {:on_error => "unable to package #{files_str} into a stemcell"})
-      end
+    def package_files
+      Dir.mktmpdir {|tmpdir|
+        @stemcell_files.each {|file| FileUtils.cp(file, tmpdir) }
+        Dir.chdir(tmpdir) do
+          @logger.info("Package #@stemcell_files to #@target ...")
+          sh "tar -czf #@target *", {:on_error => "unable to package #@stemcell_files into a stemcell"}
+        end
+      }
+      @target
     end
 
     def sanity_check
@@ -217,7 +234,7 @@ private
       dst = File.join(definition_dest_dir, "_bosh_agent.tar")
       if File.directory? @agent_src_path
         Dir.chdir(@agent_src_path) do
-          sh("bundle package && gem build bosh_agent.gemspec", {:on_error => "Unable to build Bosh Agent gem"})
+          system("bundle package > /dev/null 2>&1 && gem build bosh_agent.gemspec > /dev/null 2>&1", {:on_error => "Unable to build Bosh Agent gem"})
           Dir.chdir(File.join(@agent_src_path, "vendor", "cache")) do
             sh("tar -cf #{dst} *.gem", {:on_error => "Unable to package bosh gems"})
           end
@@ -245,11 +262,11 @@ private
     end
 
     def definition_dir
-      @definition_dir ||= File.join(File.dirname(__FILE__), "..", "..", "templates", type)
+      File.expand_path(@definition_dir ||= File.join(File.dirname(__FILE__), "..", "..", "templates", type))
     end
 
     def definition_dest_dir
-      @definition_dest_dir ||= File.join(@prefix, "definitions", @name)
+      @definition_dest_dir ||= File.join(@prefix, "definitions", @vm_name)
     end
 
     def gui?
