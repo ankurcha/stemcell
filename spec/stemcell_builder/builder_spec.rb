@@ -122,7 +122,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
   it "Build VM works properly" do
     # Expectations
     Kernel.should_receive(:system).with("veewee vbox build '#{@stemcell.vm_name}' --force --auto --nogui").and_return(true)
-    Kernel.should_receive(:system).with("VBoxManage export '#{@stemcell.vm_name}' --output image.ovf").and_return(true)
+    Kernel.should_receive(:system).with("vagrant basebox export '#{@stemcell.vm_name}' --force").and_return(true)
 
     Kernel.should_receive(:system).with("veewee vbox destroy '#{@stemcell.vm_name}' --force --nogui").and_return(true)
 
@@ -165,6 +165,9 @@ describe Bosh::Agent::StemCell::BaseBuilder do
       # Create the box file
       FileUtils.touch "image-disk1.vmdk"
       FileUtils.touch "image.ovf"
+      FileUtils.touch "Vagrantfile" # Unused
+
+      system "tar -cvf #{@stemcell.vm_name}.box image-disk1.vmdk image.ovf Vagrantfile"
     }
 
     @stemcell.package_stemcell()

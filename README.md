@@ -10,6 +10,9 @@ Install virtualbox
 Install veewee
     $ gem install veewee --no-ri --no-rdoc
 
+Install vagrant
+    $ gem install vagrant --no-ri --no-rdoc
+
 Install stemcell builder
     $ gem install stemcell
 

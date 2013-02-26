@@ -2,8 +2,8 @@ require 'logger/colors'
 require 'veewee'
 require 'deep_merge'
 require 'erb'
-require 'digest'
 require 'securerandom'
+require 'digest/sha1'
 
 module Bosh::Agent::StemCell
 
@@ -49,10 +49,10 @@ module Bosh::Agent::StemCell
     #  }
     #}
     def initialize(opts)
-      @vm_name = SecureRandom.uuid
       @logger = opts[:logger] || Logger.new(STDOUT)
       @logger.level = Logger.const_get(opts[:log_level] || "INFO")
       @name = opts[:name] || Bosh::Agent::StemCell::DEFAULT_STEMCELL_NAME
+      @vm_name = opts[:name] || SecureRandom.uuid
       @prefix = File.expand_path(opts[:prefix] || Dir.pwd)
       @infrastructure = opts[:infrastructure] || Bosh::Agent::StemCell::DEFAULT_INFRASTRUCTURE
       @architecture = opts[:architecture] || Bosh::Agent::StemCell::DEFAULT_ARCHITECTURE
@@ -95,7 +95,7 @@ module Bosh::Agent::StemCell
         execute_veewee_cmd "build '#@vm_name' --force --auto #{nogui_str}", {:on_error => "Unable to build vm #@name"}
 
         @logger.info "Export built VM #@name to #@prefix"
-        system "VBoxManage export '#@vm_name' --output image.ovf", {:on_error => "Unable to export VM #@name"}
+        system "vagrant basebox export '#@vm_name' --force", {:on_error => "Unable to export VM #@name: vagrant basebox export '#@name'"}
 
         @logger.debug "Sending veewee destroy for #@name"
         execute_veewee_cmd "destroy '#@vm_name' --force #{nogui_str}"
@@ -129,8 +129,9 @@ module Bosh::Agent::StemCell
     def generate_image
       image_path = File.join @prefix, "image"
       Dir.chdir(@prefix) do
-        system("tar -czf #{image_path} image-disk1.vmdk image.ovf", {:on_error=>"Unable to create image file from ovf and vmdk"})
-        FileUtils.rm %w(image.ovf image-disk1.vmdk)
+        system("tar -xzf #@vm_name.box", {:on_error => "Unable to unpack .box file"})
+        system("tar -czf #{image_path} *.vmdk *.ovf", {:on_error=>"Unable to create image file from ovf and vmdk"})
+        FileUtils.rm [Dir.glob('*.box'), Dir.glob('*.vmdk'), Dir.glob('*.ovf'), "Vagrantfile"]
         @image_sha1 = Digest::SHA1.file(image_path).hexdigest
       end
       image_path
@@ -152,6 +153,7 @@ module Bosh::Agent::StemCell
     end
 
     def cleanup
+      @logger.info "Cleaning up files: #@stemcell_files"
       FileUtils.rm_rf @stemcell_files
     end
 
@@ -232,7 +234,7 @@ private
       dst = File.join(definition_dest_dir, "_bosh_agent.tar")
       if File.directory? @agent_src_path
         Dir.chdir(@agent_src_path) do
-          system("bundle package && gem build bosh_agent.gemspec", {:on_error => "Unable to build Bosh Agent gem"})
+          system("bundle package > /dev/null 2>&1 && gem build bosh_agent.gemspec > /dev/null 2>&1", {:on_error => "Unable to build Bosh Agent gem"})
           Dir.chdir(File.join(@agent_src_path, "vendor", "cache")) do
             system("tar -cf #{dst} *.gem", {:on_error => "Unable to package bosh gems"})
           end
@@ -260,7 +262,7 @@ private
     end
 
     def definition_dir
-      @definition_dir ||= File.join(File.dirname(__FILE__), "..", "..", "templates", type)
+      File.expand_path(@definition_dir ||= File.join(File.dirname(__FILE__), "..", "..", "templates", type))
     end
 
     def definition_dest_dir
