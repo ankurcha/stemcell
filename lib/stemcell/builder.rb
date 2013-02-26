@@ -52,7 +52,7 @@ module Bosh::Agent::StemCell
       @logger = opts[:logger] || Logger.new(STDOUT)
       @logger.level = Logger.const_get(opts[:log_level] || "INFO")
       @name = opts[:name] || Bosh::Agent::StemCell::DEFAULT_STEMCELL_NAME
-      @vm_name = opts[:name] || SecureRandom.uuid
+      @vm_name = opts[:name] || SecureRandom.uuid.gsub(/-/,'')
       @prefix = File.expand_path(opts[:prefix] || Dir.pwd)
       @infrastructure = opts[:infrastructure] || Bosh::Agent::StemCell::DEFAULT_INFRASTRUCTURE
       @architecture = opts[:architecture] || Bosh::Agent::StemCell::DEFAULT_ARCHITECTURE
