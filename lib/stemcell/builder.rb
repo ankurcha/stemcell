@@ -317,7 +317,7 @@ private
 
     def ssh_download_file(host,source, destination, options = {})
       require 'net/scp'
-      @logger.debug "SCP #{options[:user]}:#{options[:password]}@#{host}:#{options[:port]} #{source} > #{destination} "
+      @logger.info "Copying #{options[:user]}:#{options[:password]}@#{host}:#{options[:port]} #{source} > #{destination} "
       downloaded_file_status = false
       Net::SCP.start(host, options[:user], { :port => options[:port] , :password => options[:password], :paranoid => false , :timeout => options[:timeout] }) do |scp|
         downloaded_file_status = scp.download!(source, destination)
