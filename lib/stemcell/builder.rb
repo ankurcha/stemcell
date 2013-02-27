@@ -130,6 +130,7 @@ module Bosh::Agent::StemCell
       image_path = File.join @prefix, "image"
       Dir.chdir(@prefix) do
         sh("tar -xzf #@vm_name.box > /dev/null 2>&1", {:on_error => "Unable to unpack .box file"})
+        Dir.glob("*.ovf") { |ovf_file| fix_virtualbox_ovf ovf_file } # Fix ovf files
         sh("tar -czf #{image_path} *.vmdk *.ovf > /dev/null 2>&1", {:on_error=>"Unable to create image file from ovf and vmdk"})
         FileUtils.rm [Dir.glob('*.box'), Dir.glob('*.vmdk'), Dir.glob('*.ovf'), "Vagrantfile"]
         @image_sha1 = Digest::SHA1.file(image_path).hexdigest
@@ -245,6 +246,19 @@ module Bosh::Agent::StemCell
     end
 
 private
+
+    # HACK: This is a compatibility hack for virtualbox
+    # In virtualbox, upon doing an export, the 'vssd:VirtualSystemType' is set to 'virtualbox-2.2'
+    # This causes problems when ESX tries to import the ovf file, we need to change it to 'vmx-07'
+    def fix_virtualbox_ovf(filepath)
+      if File.exists?(filepath)
+        file_contents = File.read(filepath).gsub(/virtualbox-2.2/, "vmx-07")
+        File.open(filepath, 'w') do |out|
+          out << file_contents
+        end
+      end
+    end
+
     # Packages the agent into a bosh_agent gem and copies it over to definition_dest_dir
     # so that it can be used as a part of the VM building process by veewee (using the definition).
     def package_agent
