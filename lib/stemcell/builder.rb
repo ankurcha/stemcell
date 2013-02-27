@@ -59,7 +59,7 @@ module Bosh::Agent::StemCell
       @agent_version = opts[:agent_version] || Bosh::Agent::VERSION
       @bosh_protocol = opts[:agent_protocol] || Bosh::Agent::BOSH_PROTOCOL
       @agent_src_path = File.expand_path(opts[:agent_src_path] || "./bosh_agent-#{@agent_version}.gem")
-      @target ||= File.join(@prefix, "bosh-#{type}-#{@agent_version}.tgz")
+      @target ||= File.join(@prefix, "#@name-#{type}-#@infrastructure-#{@agent_version}.tgz")
       @iso = opts[:iso]
       @iso_md5 = opts[:iso_md5]
       @gui = opts[:gui]
