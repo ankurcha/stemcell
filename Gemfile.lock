@@ -5,6 +5,7 @@ PATH
       deep_merge
       kwalify
       logger-colors
+      net-ssh
       thor
       vagrant
       veewee
