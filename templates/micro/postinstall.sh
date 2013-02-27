@@ -35,4 +35,12 @@ rm -f timestamp.sh apt-upgrade.sh sudo.sh setup-bosh.sh base-stemcell.sh monit.s
 rm -f zero-disk.sh harden.sh micro.sh postinstall.sh _release.yml _release.tar _package_compiler.tar *.iso *.gem
 
 # Clean out ssh host keys
-rm -f /etc/ssh/ssh_host_*
+# install runonce
+mkdir -p /etc/local/runonce.d/ran
+cp $SRC_DIR/_runonce /usr/local/bin/runonce
+chmod +x /usr/local/bin/runonce
+
+# Do some firstboot clean up
+# Regenerate ssh keys
+/usr/local/bin/runonce "rm -f /etc/ssh/ssh_host_*"
+/usr/local/bin/runonce "dpkg-reconfigure -fnoninteractive -pcritical openssh-server"

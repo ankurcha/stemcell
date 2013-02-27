@@ -13,5 +13,13 @@ rm -f base.sh sudo.sh setup-bosh.sh monit.sh ruby.sh bosh_agent.sh vmware-tools.
 rm -f *.iso *.gem
 
 # Clean out ssh host keys
-rm -f /etc/ssh/ssh_host_*
+# install runonce
+mkdir -p /etc/local/runonce.d/ran
+cp $SRC_DIR/_runonce /usr/local/bin/runonce
+chmod +x /usr/local/bin/runonce
 
+# Do some firstboot clean up
+# Regenerate ssh keys
+/usr/local/bin/runonce "rm -f /etc/ssh/ssh_host_*"
+ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key -N ''
+ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N ''
