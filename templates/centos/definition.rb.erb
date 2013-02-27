@@ -2,6 +2,7 @@ Veewee::Session.declare({
   :cpu_count => '1', :memory_size=> '480',
   :disk_size => '10140', :disk_format => 'VDI', :hostiocache => 'off',
   :virtualbox => { :vm_options => ["pae" => "on", "ioapic" => "on"]},
+  :use_sata => false,
   :os_type_id => 'RedHat_64',
   :iso_file => "<%= @iso_filename %>",
   :iso_src => "<%= @iso %>",
