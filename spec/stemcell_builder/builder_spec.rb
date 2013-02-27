@@ -179,7 +179,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
       YAML.load_file("stemcell.MF").should eq @stemcell.manifest
       File.exists?("image").should be_true
       system "tar -xzf image"
-      File.read("image.ovf").should eq '<vssd:VirtualSystemType>vmx-07</vssd:VirtualSystemType>'
+      File.read("image.ovf").should eq '<vssd:VirtualSystemType>vmx-04 vmx-07 vmx-08</vssd:VirtualSystemType>'
     }
   end
 

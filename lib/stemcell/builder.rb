@@ -252,7 +252,7 @@ private
     # This causes problems when ESX tries to import the ovf file, we need to change it to 'vmx-07'
     def fix_virtualbox_ovf(filepath)
       if File.exists?(filepath)
-        file_contents = File.read(filepath).gsub(/virtualbox-2.2/, "vmx-07")
+        file_contents = File.read(filepath).gsub(/virtualbox-2.2/, "vmx-04 vmx-07 vmx-08")
         File.open(filepath, 'w') do |out|
           out << file_contents
         end
