@@ -94,6 +94,9 @@ module Bosh::Agent::StemCell
 
         execute_veewee_cmd "build '#@vm_name' --force --auto #{nogui_str}", {:on_error => "Unable to build vm #@name"}
 
+        # execute pre-shutdown hook
+        pre_shutdown_hook
+
         @logger.info "Export built VM #@name to #@prefix"
         sh "vagrant basebox export '#@vm_name' --force", {:on_error => "Unable to export VM #@name: vagrant basebox export '#@vm_name'"}
 
@@ -101,6 +104,10 @@ module Bosh::Agent::StemCell
         execute_veewee_cmd "destroy '#@vm_name' --force #{nogui_str}"
       end
 
+    end
+
+    def pre_shutdown_hook
+      # nothing
     end
 
     def type
@@ -113,7 +120,7 @@ module Bosh::Agent::StemCell
 
     # Packages the stemcell contents (defined as the array of file path argument)
     def package_stemcell
-      @stemcell_files << generate_image << generate_manifest << generate_pkg_list
+      @stemcell_files << generate_image << generate_manifest << stemcell_files
       # package up files
       package_files
     end
@@ -138,10 +145,8 @@ module Bosh::Agent::StemCell
       image_path
     end
 
-    def generate_pkg_list
-      package_list_file = File.join(@prefix, "stemcell_dpkg_l.txt")
-      FileUtils.touch package_list_file
-      package_list_file
+    def stemcell_files
+      # No extra stemcell files
     end
 
     # Main execution method that sets up the directory, builds the VM and packages everything into a stemcell
@@ -202,7 +207,7 @@ module Bosh::Agent::StemCell
     # Package all files specified as arguments into a tar. The output file is specified by the :target option
     def package_files
       Dir.mktmpdir {|tmpdir|
-        @stemcell_files.each {|file| FileUtils.cp(file, tmpdir) }
+        @stemcell_files.each {|file| FileUtils.cp(file, tmpdir) unless file.nil? } # only copy files that are not nil
         Dir.chdir(tmpdir) do
           @logger.info("Package #@stemcell_files to #@target ...")
           sh "tar -czf #@target * > /dev/null 2>&1", {:on_error => "unable to package #@stemcell_files into a stemcell"}
