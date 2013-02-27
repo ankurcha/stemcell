@@ -315,6 +315,16 @@ private
       }
     end
 
+    def ssh_download_file(host,source, destination, options = {})
+      require 'net/scp'
+
+      downloaded_file_status = false
+      Net::SCP.start(host, options[:user], { :port => options[:port] , :password => options[:password], :paranoid => false , :timeout => options[:timeout] }) do |scp|
+        downloaded_file_status = scp.download!(source, destination)
+      end
+      downloaded_file_status
+    end
+
   end
 end
 
