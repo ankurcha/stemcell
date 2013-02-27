@@ -162,9 +162,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
     Dir.chdir(@prefix_dir) do
       # Create the box file
       FileUtils.touch "image-disk1.vmdk"
-      File.open("image.ovf", "w")do |out|
-        out << '<vssd:VirtualSystemType>virtualbox-2.2</vssd:VirtualSystemType>'
-      end
+      FileUtils.touch "image.ovf"
       FileUtils.touch "Vagrantfile" # Unused
       system "tar -zcf #{File.join(@prefix_dir, @stemcell.vm_name)}.box image-disk1.vmdk image.ovf Vagrantfile"
     end
@@ -179,7 +177,11 @@ describe Bosh::Agent::StemCell::BaseBuilder do
       YAML.load_file("stemcell.MF").should eq @stemcell.manifest
       File.exists?("image").should be_true
       system "tar -xzf image"
-      File.read("image.ovf").should eq '<vssd:VirtualSystemType>vmx-04 vmx-07 vmx-08</vssd:VirtualSystemType>'
+      ovf_file = File.read("image.ovf")
+      ovf_file.should include "<vssd:VirtualSystemType>vmx-04 vmx-07 vmx-08</vssd:VirtualSystemType>"
+      ovf_file.should include "<File ovf:href=\"image-disk1.vmdk\" ovf:id=\"file1\"/>"
+      ovf_file.should include "<VirtualSystem ovf:id=\"#{@stemcell.vm_name}\">"
+      ovf_file.should include "<vssd:VirtualSystemIdentifier>#{@stemcell.vm_name}</vssd:VirtualSystemIdentifier>"
     }
   end
 

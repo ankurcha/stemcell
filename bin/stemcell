@@ -103,7 +103,7 @@ module StemCellBuilderCLI
       Dir.chdir(dir) do
         puts "Validating #{File.basename(file)} ... "
         if Kernel.system("tar -xzf #{file}")
-          schema = YAML.load_file(File.join(File.dirname(__FILE__), "..", "schema", "stemcell_mf_schema.yaml"))
+          schema = YAML.load_file(File.join(File.dirname(__FILE__), "..", "assets", "stemcell_mf_schema.yaml"))
           validator = Kwalify::Validator.new(schema)
           stemcell_mf = YAML.load_file("stemcell.MF")
           error_list = validator.validate(stemcell_mf)

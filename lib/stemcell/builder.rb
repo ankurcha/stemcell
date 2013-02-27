@@ -137,7 +137,8 @@ module Bosh::Agent::StemCell
       image_path = File.join @prefix, "image"
       Dir.chdir(@prefix) do
         sh("tar -xzf #@vm_name.box > /dev/null 2>&1", {:on_error => "Unable to unpack .box file"})
-        Dir.glob("*.ovf") { |ovf_file| fix_virtualbox_ovf ovf_file } # Fix ovf files
+        vmdk_filename = Dir.glob("*.vmdk").first
+        Dir.glob("*.ovf") { |ovf_file| fix_virtualbox_ovf(ovf_file, vmdk_filename) } # Fix ovf files
         sh("tar -czf #{image_path} *.vmdk *.ovf > /dev/null 2>&1", {:on_error=>"Unable to create image file from ovf and vmdk"})
         FileUtils.rm [Dir.glob('*.box'), Dir.glob('*.vmdk'), Dir.glob('*.ovf'), "Vagrantfile"]
         @image_sha1 = Digest::SHA1.file(image_path).hexdigest
@@ -252,16 +253,11 @@ module Bosh::Agent::StemCell
 
 private
 
-    # HACK: This is a compatibility hack for virtualbox
-    # In virtualbox, upon doing an export, the 'vssd:VirtualSystemType' is set to 'virtualbox-2.2'
-    # This causes problems when ESX tries to import the ovf file, we need to change it to 'vmx-07'
-    def fix_virtualbox_ovf(filepath)
-      if File.exists?(filepath)
-        file_contents = File.read(filepath).gsub(/virtualbox-2.2/, "vmx-04 vmx-07 vmx-08")
-        File.open(filepath, 'w') do |out|
-          out << file_contents
-        end
-      end
+    # HACK: This is a compatibility hack for virtualbox-esx compatibility
+    def fix_virtualbox_ovf(filepath, vmdk_filename="box-disk1.vmdk")
+      @vmdk_filename = vmdk_filename
+      vmware_ovf_erb = File.join(File.dirname(__FILE__), "..", "..", "assets", "box.ovf.erb")
+      compile_erb(vmware_ovf_erb, filepath)
     end
 
     # Packages the agent into a bosh_agent gem and copies it over to definition_dest_dir
@@ -316,13 +312,12 @@ private
 
       File.open(new_file_path, "w"){|f|
         f.write(ERB.new(File.read(File.expand_path(erb_file))).result(binding))
-        File.delete erb_file
       }
     end
 
     def ssh_download_file(host,source, destination, options = {})
       require 'net/scp'
-
+      @logger.debug "SCP #{options[:user]}:#{options[:password]}@#{host}:#{options[:port]} #{source} > #{destination} "
       downloaded_file_status = false
       Net::SCP.start(host, options[:user], { :port => options[:port] , :password => options[:password], :paranoid => false , :timeout => options[:timeout] }) do |scp|
         downloaded_file_status = scp.download!(source, destination)
