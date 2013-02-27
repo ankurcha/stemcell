@@ -100,7 +100,7 @@ module Bosh::Agent::StemCell
         @logger.info "Export built VM #@name to #@prefix"
         sh "vagrant basebox export '#@vm_name' --force", {:on_error => "Unable to export VM #@name: vagrant basebox export '#@vm_name'"}
 
-        @logger.debug "Sending veewee destroy for #@name"
+        @logger.info "Deleting Virtual machine #@vm_name"
         execute_veewee_cmd "destroy '#@vm_name' --force #{nogui_str}"
       end
 
@@ -255,6 +255,7 @@ private
 
     # HACK: This is a compatibility hack for virtualbox-esx compatibility
     def fix_virtualbox_ovf(filepath, vmdk_filename="box-disk1.vmdk")
+      @logger.info "Generating ovf file for virtual machine"
       @vmdk_filename = vmdk_filename
       vmware_ovf_erb = File.join(File.dirname(__FILE__), "..", "..", "assets", "box.ovf.erb")
       compile_erb(vmware_ovf_erb, filepath)
