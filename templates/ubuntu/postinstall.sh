@@ -44,3 +44,6 @@ chmod +x /usr/local/bin/runonce
 # Regenerate ssh keys
 /usr/local/bin/runonce "rm -f /etc/ssh/ssh_host_*"
 /usr/local/bin/runonce "dpkg-reconfigure -fnoninteractive -pcritical openssh-server"
+
+# Clean up cdrom rules
+rm /etc/udev/rules.d/70-persistent-cd.rules
