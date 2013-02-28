@@ -46,4 +46,5 @@ chmod +x /usr/local/bin/runonce
 /usr/local/bin/runonce "dpkg-reconfigure -fnoninteractive -pcritical openssh-server"
 
 # Clean up cdrom rules
-rm /etc/udev/rules.d/70-persistent-cd.rules
+sed -i -e 's/cdrom1/cdrom/g' /etc/udev/rules.d/70-persistent-cd.rules
+sed -i -e 's/dvd1/dvd/g' /etc/udev/rules.d/70-persistent-cd.rules
