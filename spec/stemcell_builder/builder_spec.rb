@@ -124,8 +124,6 @@ describe Bosh::Agent::StemCell::BaseBuilder do
     Kernel.should_receive(:system).with("veewee vbox build '#{@stemcell.vm_name}' --force --auto --nogui").and_return(true)
     Kernel.should_receive(:system).with("vagrant basebox export '#{@stemcell.vm_name}' --force").and_return(true)
 
-    Kernel.should_receive(:system).with("veewee vbox destroy '#{@stemcell.vm_name}' --force --nogui").and_return(true)
-
     @stemcell.build_vm
   end
 
@@ -178,7 +176,7 @@ describe Bosh::Agent::StemCell::BaseBuilder do
       File.exists?("image").should be_true
       system "tar -xzf image"
       ovf_file = File.read("image.ovf")
-      ovf_file.should include "<vssd:VirtualSystemType>vmx-04 vmx-07 vmx-08</vssd:VirtualSystemType>"
+      ovf_file.should include "<vssd:VirtualSystemType>vmx-07</vssd:VirtualSystemType>"
       ovf_file.should include "<File ovf:href=\"image-disk1.vmdk\" ovf:id=\"file1\"/>"
       ovf_file.should include "<VirtualSystem ovf:id=\"#{@stemcell.vm_name}\">"
       ovf_file.should include "<vssd:VirtualSystemIdentifier>#{@stemcell.vm_name}</vssd:VirtualSystemIdentifier>"

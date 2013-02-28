@@ -99,9 +99,6 @@ module Bosh::Agent::StemCell
 
         @logger.info "Export built VM #@name to #@prefix"
         sh "vagrant basebox export '#@vm_name' --force", {:on_error => "Unable to export VM #@name: vagrant basebox export '#@vm_name'"}
-
-        @logger.info "Deleting Virtual machine #@vm_name"
-        execute_veewee_cmd "destroy '#@vm_name' --force #{nogui_str}"
       end
 
     end
