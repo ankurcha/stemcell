@@ -9,8 +9,8 @@ Gem::Specification.new do |gem|
   gem.authors                     = ["Ankur Chauhan", "Anfernee Yongkun Gui"]
   gem.email                       = ["ankurc@vmware.com", "agui@vmware.com"]
   gem.description                 = "Stemcell builder for Bosh"
-  gem.summary                     = "A commandline utility for creating stemcells for Bosh"
-  gem.homepage                    = "http://www.github.com/cloudfoundry/bosh"
+  gem.summary                     = "A commandline utility for creating stemcells for Bosh [ http://www.github.com/ankurcha/stemcell ]"
+  gem.homepage                    = "http://www.github.com/ankurcha/stemcell"
   gem.license                     = "MIT"
 
   gem.files                       = `git ls-files`.split($/)
