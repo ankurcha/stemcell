@@ -272,9 +272,7 @@ private
           sh("tar -rf #{dst} *.gem > /dev/null 2>&1", {:on_error => "Unable to add bosh_agent gem to #{dst}"})
         end
       else
-        Dir.chdir(File.dirname(@agent_src_path)) do
-          sh("tar -cf #{dst} #@agent_src_path > /dev/null 2>&1", {:on_error => "Unable to package bosh agent gems"})
-        end
+        FileUtils.mv @agent_src_path, dst
       end
     end
 
