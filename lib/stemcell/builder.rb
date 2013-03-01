@@ -314,11 +314,17 @@ private
     def ssh_download_file(host,source, destination, options = {})
       require 'net/scp'
       @logger.info "Copying #{options[:user]}:#{options[:password]}@#{host}:#{options[:port]} #{source} > #{destination} "
-      downloaded_file_status = false
-      Net::SCP.start(host, options[:user], { :port => options[:port] , :password => options[:password], :paranoid => false , :timeout => options[:timeout] }) do |scp|
-        downloaded_file_status = scp.download!(source, destination)
+      5.times do
+        begin
+          Net::SCP.start(host, options[:user], { :port => options[:port] , :password => options[:password], :paranoid => false , :timeout => options[:timeout] }) do |scp|
+            return scp.download!(source, destination)
+          end
+        rescue
+          sleep 2 # sleep for a while
+          @logger.debug "Retrying: Download #{source}"
+        end
       end
-      downloaded_file_status
+      false
     end
 
   end
