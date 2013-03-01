@@ -264,7 +264,10 @@ protected
       @logger.info "Copying #{ssh_options[:user]}:#{ssh_options[:password]}@#{ssh_options[:host]}:#{ssh_options[:port]} #{source} > #{destination} "
       5.times do
         begin
-          Net::SCP.start(ssh_options[:host], ssh_options[:user], ssh_options) do |scp|
+          opts = ssh_options.dup
+          opts.delete(:host) if opts.has_key?(:host)
+          opts.delete(:user) if opts.has_key?(:user)
+          Net::SCP.start(ssh_options[:host], ssh_options[:user], opts) do |scp|
             return scp.download!(source, destination)
           end
         rescue => e
