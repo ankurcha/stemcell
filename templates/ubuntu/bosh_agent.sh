@@ -16,7 +16,7 @@ pushd /tmp/bosh_agent
     echo '#!/bin/bash
     export PATH=/var/vcap/bosh/bin:$PATH
     exec 2>&1
-    exec /var/vcap/bosh/bin/bosh_agent --configure --infrastructure=`cat /etc/infrastructure`
+    exec /var/vcap/bosh/bin/bosh_agent --configure --infrastructure=`cat /etc/infrastructure` --platform=ubuntu
     ' > /etc/sv/agent/run
 
     echo '#!/bin/bash
