@@ -262,7 +262,7 @@ protected
     def ssh_download_file(source, destination)
       require 'net/scp'
 
-      @logger.info "Copying #{ssh_options[:user]}:#{ssh_options[:password]}@#{host}:#{ssh_options[:port]} #{source} > #{destination} "
+      @logger.info "Copying #{ssh_options[:user]}:#{ssh_options[:password]}@#{ssh_options[:host]}:#{ssh_options[:port]} #{source} > #{destination} "
       5.times do
         begin
           Net::SCP.start(ssh_options[:host], ssh_options[:user], ssh_options) do |scp|
