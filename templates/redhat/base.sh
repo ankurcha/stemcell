@@ -28,13 +28,15 @@ enabled=0
 gpgcheck=0
 EOM
 
+rpm -U --nosignature http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+
 # Base install
 sed -i "s/^.*requiretty/#Defaults requiretty/" /etc/sudoers
 
 # system update
 yum -y update
 yum -y groupinstall "Development Tools"
-yum -y install gcc make gcc-c++ kernel-devel-`uname -r` zlib-devel openssl-devel \
+yum -y install sudo gcc make gcc-c++ kernel-devel-`uname -r` zlib-devel openssl-devel \
 readline-devel sqlite-devel perl wget dkms curl ntp crontabs sysstat pam-devel
 yum -y install libxslt-devel libyaml-devel libxml2-devel gdbm-devel libffi-devel zlib-devel \
 openssl-devel libyaml-devel readline-devel curl-devel openssl-devel pcre-devel git postgresql-devel

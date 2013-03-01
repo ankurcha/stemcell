@@ -307,6 +307,10 @@ private
     # Copies the veewee definition directory from ../templates/#@type to #@prefix/definitions/#@name
     def copy_definitions
       @logger.info "Creating definition dest dir"
+      if Dir.exists? definition_dest_dir
+        @logger.warn "#{definition_dest_dir} already exists, contents will be deleted"
+        FileUtils.rm_rf definition_dest_dir
+      end
       FileUtils.mkdir_p definition_dest_dir
 
       @logger.info "Copying definition from #{definition_dir} to #{definition_dest_dir}"
