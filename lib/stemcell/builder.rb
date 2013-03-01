@@ -263,14 +263,15 @@ protected
       require 'net/scp'
 
       5.times do
-        sleep 2 # sleep for a while
         @logger.info "Copying #{ssh_options[:user]}:#{ssh_options[:password]}@#{ssh_options[:host]}:#{ssh_options[:port]} #{source} > #{destination} "
         begin
           Net::SCP.start(ssh_options[:host], ssh_options[:user], ssh_options) do |scp|
             return scp.download!(source, destination)
           end
-        rescue
-          @logger.debug "Failed to download #{source}"
+        rescue => e
+          @logger.info "Failed to download #{source}, ERROR: #{e.message}"
+          @logger.info "Wait for 5 seconds"
+          sleep 5 # sleep for a while
         end
       end
       false
