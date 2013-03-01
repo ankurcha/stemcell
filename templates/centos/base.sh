@@ -7,13 +7,9 @@ source _variables.sh
 # Base install
 sed -i "s/^.*requiretty/#Defaults requiretty/" /etc/sudoers
 
-cat > /etc/yum.repos.d/epel.repo << EOM
-[epel]
-name=epel
-baseurl=http://download.fedoraproject.org/pub/epel/6/x86_64
-enabled=1
-gpgcheck=0
-EOM
+wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+sudo rpm -Uvh remi-release-6*.rpm epel-release-6*.rpm
 
 # system update
 yum -y update

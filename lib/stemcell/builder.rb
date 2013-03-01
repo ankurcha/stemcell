@@ -262,17 +262,16 @@ protected
     def ssh_download_file(source, destination)
       require 'net/scp'
 
-      @logger.info "Copying #{ssh_options[:user]}:#{ssh_options[:password]}@#{ssh_options[:host]}:#{ssh_options[:port]} #{source} > #{destination} "
       5.times do
+        sleep 2 # sleep for a while
+        @logger.info "Copying #{ssh_options[:user]}:#{ssh_options[:password]}@#{ssh_options[:host]}:#{ssh_options[:port]} #{source} > #{destination} "
         begin
           Net::SCP.start(ssh_options[:host], ssh_options[:user], ssh_options) do |scp|
             return scp.download!(source, destination)
           end
         rescue
-          sleep 2 # sleep for a while
-          @logger.debug "Retrying: Download #{source}"
+          @logger.debug "Failed to download #{source}"
         end
-        raise "Failed to download #{source}"
       end
       false
     end
