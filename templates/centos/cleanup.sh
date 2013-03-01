@@ -12,6 +12,8 @@ mkdir -p /etc/local/runonce.d/ran
 cp $SRC_DIR/_runonce /usr/local/bin/runonce
 chmod +x /usr/local/bin/runonce
 
+sed -i -e 's/^\(HWADDR=.*\)$//g' /etc/sysconfig/network-scripts/ifcfg-eth*
+rm /etc/udev/rules.d/70-persistent-net.rules
 # Do some firstboot clean up
 # Regenerate ssh keys
 /usr/local/bin/runonce "rm -f /etc/ssh/ssh_host_*"
