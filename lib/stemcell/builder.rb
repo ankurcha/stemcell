@@ -261,9 +261,8 @@ protected
 
     def ssh_download_file(source, destination)
       require 'net/scp'
-
+      @logger.info "Copying #{ssh_options[:user]}:#{ssh_options[:password]}@#{ssh_options[:host]}:#{ssh_options[:port]} #{source} > #{destination} "
       5.times do
-        @logger.info "Copying #{ssh_options[:user]}:#{ssh_options[:password]}@#{ssh_options[:host]}:#{ssh_options[:port]} #{source} > #{destination} "
         begin
           Net::SCP.start(ssh_options[:host], ssh_options[:user], ssh_options) do |scp|
             return scp.download!(source, destination)
@@ -274,6 +273,7 @@ protected
           sleep 5 # sleep for a while
         end
       end
+      @logger.warn "Unable to download #{source}" unless File.exists?(destination)
       false
     end
 
