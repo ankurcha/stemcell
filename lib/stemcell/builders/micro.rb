@@ -58,6 +58,15 @@ module Bosh::Agent::StemCell
       @logger.info("The release tar will be in bosh/release/dev_releases/micro-bosh*.tgz")
     end
 
+    def pre_shutdown_hook
+      ssh_download_file("/var/vcap/bosh/stemcell_dpkg_l.out", File.join(@prefix, "stemcell_dpkg_l.out"))
+      ssh_download_file("/var/vcap/micro/apply_spec.yml", File.join(@prefix, "apply_spec.yml"))
+    end
+
+    def stemcell_files
+      [File.join(@prefix, "stemcell_dpkg_l.out"), File.join(@prefix, "apply_spec.yml")]
+    end
+
   end
 
 end

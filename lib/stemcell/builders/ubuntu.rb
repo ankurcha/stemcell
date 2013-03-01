@@ -21,14 +21,7 @@ module Bosh::Agent::StemCell
     end
 
     def pre_shutdown_hook
-      # We need a way to parametrize all this
-      options = {
-          :host => '127.0.0.1',
-          :user => 'vcap',
-          :password => 'c1oudc0w',
-          :port => '7222'
-      }
-      ssh_download_file(options[:host], "/var/vcap/bosh/stemcell_dpkg_l.out", File.join(@prefix, "stemcell_dpkg_l.out"), options)
+      ssh_download_file("/var/vcap/bosh/stemcell_dpkg_l.out", File.join(@prefix, "stemcell_dpkg_l.out"))
     end
 
     def stemcell_files

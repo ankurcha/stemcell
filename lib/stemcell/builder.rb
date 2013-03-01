@@ -175,7 +175,7 @@ module Bosh::Agent::StemCell
       }
     end
 
-    protected
+protected
 
     # Cross-platform way of finding an executable in the $PATH.
     #
@@ -205,7 +205,7 @@ module Bosh::Agent::StemCell
     # Package all files specified as arguments into a tar. The output file is specified by the :target option
     def package_files
       Dir.mktmpdir {|tmpdir|
-        @stemcell_files.each {|file| FileUtils.cp(file, tmpdir) unless file.nil? } # only copy files that are not nil
+        @stemcell_files.flatten.each {|file| FileUtils.cp(file, tmpdir) unless file.nil? } # only copy files that are not nil
         Dir.chdir(tmpdir) do
           @logger.info("Package #@stemcell_files to #@target ...")
           sh "tar -czf #@target * > /dev/null 2>&1", {:on_error => "unable to package #@stemcell_files into a stemcell"}
@@ -246,6 +246,35 @@ module Bosh::Agent::StemCell
       end
 
       exit_status
+    end
+
+    def ssh_options
+      {
+          :host => '127.0.0.1',
+          :user => 'vcap',
+          :password => 'c1oudc0w',
+          :port => '7222',
+          :paranoid => false,
+          :timeout => 30
+      }
+    end
+
+    def ssh_download_file(source, destination)
+      require 'net/scp'
+
+      @logger.info "Copying #{ssh_options[:user]}:#{ssh_options[:password]}@#{host}:#{ssh_options[:port]} #{source} > #{destination} "
+      5.times do
+        begin
+          Net::SCP.start(ssh_options[:host], ssh_options[:user], ssh_options) do |scp|
+            return scp.download!(source, destination)
+          end
+        rescue
+          sleep 2 # sleep for a while
+          @logger.debug "Retrying: Download #{source}"
+        end
+        raise "Failed to download #{source}"
+      end
+      false
     end
 
 private
@@ -309,22 +338,6 @@ private
       File.open(new_file_path, "w"){|f|
         f.write(ERB.new(File.read(File.expand_path(erb_file))).result(binding))
       }
-    end
-
-    def ssh_download_file(host,source, destination, options = {})
-      require 'net/scp'
-      @logger.info "Copying #{options[:user]}:#{options[:password]}@#{host}:#{options[:port]} #{source} > #{destination} "
-      5.times do
-        begin
-          Net::SCP.start(host, options[:user], { :port => options[:port] , :password => options[:password], :paranoid => false , :timeout => options[:timeout] }) do |scp|
-            return scp.download!(source, destination)
-          end
-        rescue
-          sleep 2 # sleep for a while
-          @logger.debug "Retrying: Download #{source}"
-        end
-      end
-      false
     end
 
   end
