@@ -5,15 +5,19 @@ The stemcell builder is a commandline tool to create new stemcells. This product
 ## Installation
 
 Install virtualbox
+
     Follow instructions on: [VirtualBox Download Page](https://www.virtualbox.org/wiki/Downloads)
 
 Install veewee
+
     $ gem install veewee --no-ri --no-rdoc
 
 Install vagrant
+
     $ gem install vagrant --no-ri --no-rdoc
 
 Install stemcell builder
+
     $ gem install stemcell
 
 ## Usage
