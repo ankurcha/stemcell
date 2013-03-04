@@ -16,5 +16,5 @@ pushd /tmp
 	git clone https://github.com/imeyer/runit-rpm.git
 	cd runit-rpm
 	./build.sh
-	rpm -ivh runit-*
+	rpm -ivh runit-*.rpm
 popd
