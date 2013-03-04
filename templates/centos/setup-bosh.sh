@@ -27,7 +27,7 @@ popd
 
 pushd /package
 	wget http://smarden.org/runit/runit-2.1.1.tar.gz
-	tar -xzf runit-2.1.1.tar.gz
+	tar xzf runit-2.1.1.tar.gz
 	rm runit-2.1.1.tar.gz
 	cd admin/runit-2.1.1
 	package/install

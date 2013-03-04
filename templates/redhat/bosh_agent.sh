@@ -6,7 +6,7 @@ mkdir -p /tmp/bosh_agent
 
 pushd /tmp/bosh_agent
     cp $SRC_DIR/_bosh_agent.tar /tmp/bosh_agent
-    tar -xvf _bosh_agent.tar
+    tar xmvf _bosh_agent.tar
     $bosh_dir/bin/gem install *.gem --force --no-ri --no-rdoc
     chmod +x $bosh_dir/agent/bin/bosh_agent
 
