@@ -12,7 +12,7 @@ pushd /usr/bin
 popd
 
 pushd /tmp
-	yum install git rpm-build rpmdevtools gcc glibc-static make
+	yum -y install git rpm-build rpmdevtools gcc glibc-static make
 	git clone https://github.com/imeyer/runit-rpm.git
 	cd runit-rpm
 	./build.sh
