@@ -4,7 +4,7 @@ Veewee::Session.declare({
                                 :os_type_id => 'RedHat_64',
                                 :iso_file => "<%= @iso_filename %>", :iso_src => "<%= @iso %>", :iso_md5 => "<%= @iso_md5 %>",
                                 :iso_download_timeout => 5000,
-                                :boot_wait => "5", :boot_cmd_sequence => ['<Tab> text ks=http://%IP%:%PORT%/ks.cfg method=cdrom<Enter>'],
+                                :boot_wait => "5", :boot_cmd_sequence => ['<Tab> text ks=http://%IP%:%PORT%/ks.cfg<Enter>'],
                                 :kickstart_port => "7122", :kickstart_timeout => 10000, :kickstart_file => "ks.cfg",
                                 :ssh_login_timeout => "10000", :ssh_user => "vcap", :ssh_password => "c1oudc0w", :ssh_key => "",
                                 :ssh_host_port => "7222", :ssh_guest_port => "22",
