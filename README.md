@@ -6,7 +6,7 @@ The stemcell builder is a commandline tool to create new stemcells. This product
 
 Install virtualbox
 
-    Follow instructions on: [VirtualBox Download Page](https://www.virtualbox.org/wiki/Downloads)
+    Follow instructions on: https://www.virtualbox.org/wiki/Downloads
 
 Install veewee
 

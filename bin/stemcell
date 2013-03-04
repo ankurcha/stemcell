@@ -1,7 +1,4 @@
 #!/usr/bin/env ruby
-#
-# Copyright (c) 2009-2012 VMware, Inc.
-
 $:.unshift File.join(__FILE__, "..", "..", "lib")
 
 require 'rubygems'
