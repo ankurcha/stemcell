@@ -25,7 +25,7 @@ pushd /tmp/bosh_agent
     # runit
     chmod +x /etc/sv/agent/run /etc/sv/agent/log/run
 
-    ln -s /etc/sv/agent /etc/service/agent
+    ln -s /etc/sv/agent /etc/service
 
     cp $SRC_DIR/_empty_state.yml $bosh_dir/state.yml
 
