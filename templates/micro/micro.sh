@@ -3,7 +3,6 @@
 source _variables.sh
 
 blobstore_path=${bosh_app_dir}/micro_bosh/data/cache
-infrastructure=$system_parameters_infrastructure
 agent_host=localhost
 agent_port=6969
 agent_uri=http://vcap:vcap@${agent_host}:${agent_port}

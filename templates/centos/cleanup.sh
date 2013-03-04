@@ -13,7 +13,11 @@ cp $SRC_DIR/_runonce /usr/local/bin/runonce
 chmod +x /usr/local/bin/runonce
 
 sed -i -e 's/^\(HWADDR=.*\)$//g' /etc/sysconfig/network-scripts/ifcfg-eth*
-rm /etc/udev/rules.d/70-persistent-net.rules
+rm -f /etc/udev/rules.d/70-persistent-net.rules
+
+# remove grub delat
+sed -i -e 's/^\(timeout=.*\)$/timeout=0/g' /boot/grub/menu.lst
+sed -i -e 's/^\(timeout=.*\)$/timeout=0/g' /boot/grub/grub.conf
 # Do some firstboot clean up
 # Regenerate ssh keys
 /usr/local/bin/runonce "rm -f /etc/ssh/ssh_host_*"

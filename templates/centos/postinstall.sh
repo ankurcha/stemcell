@@ -21,7 +21,7 @@ crontab -u root /tmp/ntpdate.cron
 rm /tmp/ntpdate.cron
 
 ### stage system_parameters
-echo -n $system_parameters_infrastructure > /etc/infrastructure
+echo -n $infrastructure > /etc/infrastructure
 
 # Create list of installed packages -- legal requirement
 yum list installed > $bosh_dir/stemcell_yum_list_installed.out

@@ -11,24 +11,10 @@ pushd /usr/bin
     fi
 popd
 
-mkdir -p /package
-chmod 1755 /package
-
-pushd /package
-    wget http://cr.yp.to/daemontools/daemontools-0.76.tar.gz
-    tar xzvf daemontools-0.76.tar.gz
-    rm -f daemontools-0.76.tar.gz
-    cd admin/daemontools-0.76/src
-    wget http://www.qmailrocks.org/downloads/patches/daemontools-0.76.errno.patch
-    patch < daemontools-0.76.errno.patch
-    cd ..
-    package/install
-popd
-
-pushd /package
-	wget http://smarden.org/runit/runit-2.1.1.tar.gz
-	tar -xzf runit-2.1.1.tar.gz
-	rm runit-2.1.1.tar.gz
-	cd admin/runit-2.1.1
-	package/install
+pushd /tmp
+	yum install git rpm-build rpmdevtools gcc glibc-static make
+	git clone https://github.com/imeyer/runit-rpm.git
+	cd runit-rpm
+	./build.sh
+	rpm -ivh runit-*
 popd

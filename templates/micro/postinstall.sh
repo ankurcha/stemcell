@@ -22,7 +22,7 @@ rm /tmp/ntpdate.cron
 ### stage micro_bosh ???
 
 ### stage system_parameters
-echo -n $system_parameters_infrastructure > /etc/infrastructure
+echo -n $infrastructure > /etc/infrastructure
 
 
 ### stage bosh_dpkg_list ??? How do we get back a list of things
