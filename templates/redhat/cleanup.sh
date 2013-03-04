@@ -16,6 +16,9 @@ rm -f _60-bosh-sysctl.conf _monitrc _ntpdate _sysstat _empty_state.yml _variable
 rm -f base.sh sudo.sh setup-bosh.sh monit.sh ruby.sh bosh_agent.sh vmware-tools.sh harden.sh timestamp.sh postinstall.sh cleanup.sh zerodisk.sh
 rm -f *.iso *.gem
 
+sed -i -e 's/^\(timeout=.*\)$/timeout=0/g' /boot/grub/menu.lst
+sed -i -e 's/^\(timeout=.*\)$/timeout=0/g' /boot/grub/grub.conf
+
 # Clean out ssh host keys
 # install runonce
 mkdir -p /etc/local/runonce.d/ran

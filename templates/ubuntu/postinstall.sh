@@ -25,6 +25,9 @@ rm /tmp/ntpdate.cron
 ### stage system_parameters
 echo -n $infrastructure > /etc/infrastructure
 
+sed -i -e 's/^\(timeout=.*\)$/timeout=0/g' /boot/grub/menu.lst
+sed -i -e 's/^\(timeout=.*\)$/timeout=0/g' /boot/grub/grub.conf
+
 
 ### stage bosh_dpkg_list ??? How do we get back a list of things
 # Create list of installed packages -- legal requirement
