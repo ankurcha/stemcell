@@ -33,9 +33,7 @@ rpm -U --nosignature http://download.fedoraproject.org/pub/epel/6/x86_64/epel-re
 # Base install
 sed -i "s/^.*requiretty/#Defaults requiretty/" /etc/sudoers
 
-# system update
-yum -y update
-yum -y groupinstall "Development Tools"
+#yum -y groupinstall "Development Tools"
 yum -y install sudo gcc make gcc-c++ kernel-devel-`uname -r` zlib-devel openssl-devel \
 readline-devel sqlite-devel perl wget dkms curl ntp crontabs sysstat pam-devel eject dash
 yum -y install libxslt-devel libyaml-devel libxml2-devel gdbm-devel libffi-devel zlib-devel \

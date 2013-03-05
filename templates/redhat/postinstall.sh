@@ -23,5 +23,8 @@ rm /tmp/ntpdate.cron
 ### stage system_parameters
 echo -n $infrastructure > /etc/infrastructure
 
+# Final system update
+yum -y update
+
 # Create list of installed packages -- legal requirement
 yum list installed > $bosh_dir/stemcell_yum_list_installed.out
