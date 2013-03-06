@@ -208,7 +208,7 @@ protected
         @stemcell_files.flatten.each {|file| FileUtils.cp(file, tmpdir) if file && File.exists?(file) } # only copy files that are not nil
         Dir.chdir(tmpdir) do
           @logger.info("Package #@stemcell_files to #@target ...")
-          sh "tar -czf #@target * > /dev/null 2>&1", {:on_error => "unable to package #@stemcell_files into a stemcell"}
+          sh "tar -czf #@target *", {:on_error => "unable to package #@stemcell_files into a stemcell"}
         end
       }
       @target
