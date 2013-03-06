@@ -4,6 +4,7 @@ set -x
 source _variables.sh
 
 mkdir -p /tmp/bosh_agent
+echo -n $infrastructure > /etc/infrastructure
 
 pushd /tmp/bosh_agent
     cp $SRC_DIR/_bosh_agent.tar /tmp/bosh_agent

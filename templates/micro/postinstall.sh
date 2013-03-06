@@ -21,10 +21,6 @@ rm /tmp/ntpdate.cron
 
 ### stage micro_bosh ???
 
-### stage system_parameters
-echo -n $infrastructure > /etc/infrastructure
-
-
 ### stage bosh_dpkg_list ??? How do we get back a list of things
 # Create list of installed packages -- legal requirement
 dpkg -l > $bosh_dir/stemcell_dpkg_l.out

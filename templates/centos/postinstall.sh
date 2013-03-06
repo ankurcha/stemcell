@@ -20,9 +20,6 @@ echo "0,15,30,45 * * * * ${bosh_dir}/bin/ntpdate" > /tmp/ntpdate.cron
 crontab -u root /tmp/ntpdate.cron
 rm /tmp/ntpdate.cron
 
-### stage system_parameters
-echo -n $infrastructure > /etc/infrastructure
-
 # Final system update
 yum -y update
 

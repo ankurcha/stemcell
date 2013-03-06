@@ -3,6 +3,7 @@
 set -x
 
 source _variables.sh
+echo -n $infrastructure > /etc/infrastructure
 
 cat > /etc/yum.repos.d/puppetlabs.repo << EOM
 [puppetlabs]

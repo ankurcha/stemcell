@@ -22,9 +22,6 @@ rm /tmp/ntpdate.cron
 
 ### stage micro_bosh ???
 
-### stage system_parameters
-echo -n $infrastructure > /etc/infrastructure
-
 sed -i -e 's/^\(timeout=.*\)$/timeout=0/g' /boot/grub/menu.lst
 sed -i -e 's/^\(timeout=.*\)$/timeout=0/g' /boot/grub/grub.conf
 

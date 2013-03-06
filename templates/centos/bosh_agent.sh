@@ -2,6 +2,8 @@
 
 source _variables.sh
 
+echo -n $infrastructure > /etc/infrastructure
+
 mkdir -p /tmp/bosh_agent
 
 pushd /tmp/bosh_agent

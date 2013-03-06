@@ -15,6 +15,7 @@ yum -y install libxslt-devel libyaml-devel libxml2-devel gdbm-devel libffi-devel
 openssl-devel libyaml-devel readline-devel curl-devel openssl-devel pcre-devel git postgresql-devel
 
 /usr/sbin/groupadd vcap
+/usr/sbin/groupadd admin
 /usr/sbin/useradd vcap -g vcap -G wheel
 echo "c1oudc0w" | passwd --stdin vcap
 echo "vcap        ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers.d/vcap
