@@ -133,10 +133,10 @@ module Bosh::Agent::StemCell
     def generate_image
       image_path = File.join @prefix, "image"
       Dir.chdir(@prefix) do
-        sh("tar -xvf #@vm_name.box > /dev/null 2>&1", {:on_error => "Unable to unpack .box file"})
+        sh("tar -xvf #@vm_name.box", {:on_error => "Unable to unpack .box file"})
         vmdk_filename = Dir.glob("*.vmdk").first
         Dir.glob("*.ovf") { |ovf_file| fix_virtualbox_ovf(ovf_file, vmdk_filename) } # Fix ovf files
-        sh("tar -czf #{image_path} *.vmdk *.ovf > /dev/null 2>&1", {:on_error=>"Unable to create image file from ovf and vmdk"})
+        sh("tar -czf #{image_path} *.vmdk *.ovf", {:on_error=>"Unable to create image file from ovf and vmdk"})
         FileUtils.rm [Dir.glob('*.box'), Dir.glob('*.vmdk'), Dir.glob('*.ovf'), "Vagrantfile"]
         @image_sha1 = Digest::SHA1.file(image_path).hexdigest
       end
@@ -208,7 +208,7 @@ protected
         @stemcell_files.flatten.each {|file| FileUtils.cp(file, tmpdir) if file && File.exists?(file) } # only copy files that are not nil
         Dir.chdir(tmpdir) do
           @logger.info("Package #@stemcell_files to #@target ...")
-          sh "tar -czf #@target * > /dev/null 2>&1", {:on_error => "unable to package #@stemcell_files into a stemcell"}
+          sh "tar -czf #@target *", {:on_error => "unable to package #@stemcell_files into a stemcell"}
         end
       }
       @target
