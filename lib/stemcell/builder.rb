@@ -236,8 +236,7 @@ protected
       unless opts[:on_error]
         opts[:on_error] = "Unable to execute: #{cmd}"
       end
-      output = Kernel.system(cmd)
-      @logger.debug(output) if output
+      Kernel.system(cmd)
       exit_status = $?.exitstatus
 
       # raise error only if silent is not true and exit_status != 0
