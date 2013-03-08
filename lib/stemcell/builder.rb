@@ -363,6 +363,7 @@ private
     end
 
     def initialize_micro(opts)
+      @logger.info "Initializing micro stemcell artifacts"
       #@bosh_src_root = opts[:bosh_src_root] || File.expand_path("bosh", @prefix)
       @release_manifest = opts[:release_manifest] # || default_release_manifest
       @release_tar = opts[:release_tar]

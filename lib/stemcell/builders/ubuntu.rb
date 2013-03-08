@@ -23,6 +23,7 @@ module Bosh::Agent::StemCell
     end
 
     def pre_shutdown_hook
+      super()
       download_file("/var/vcap/bosh/stemcell_dpkg_l.out")
     end
 

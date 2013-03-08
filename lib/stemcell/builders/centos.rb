@@ -17,6 +17,7 @@ module Bosh::Agent::StemCell
     end
 
     def pre_shutdown_hook
+      super()
       download_file "/var/vcap/bosh/stemcell_yum_list_installed.out"
       # add file to the list of files to be packaged
       @stemcell_files << File.join(@prefix, "stemcell_yum_list_installed.out")
