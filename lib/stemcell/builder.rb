@@ -320,11 +320,7 @@ private
       dst = File.join(definition_dest_dir, "_bosh_agent.tar")
       if File.directory? @agent_src_path
         Dir.chdir(@agent_src_path) do
-          sh("bundle package > /dev/null 2>&1 && gem build bosh_agent.gemspec > /dev/null 2>&1", {:on_error => "Unable to build Bosh Agent gem"})
-          Dir.chdir(File.join(@agent_src_path, "vendor", "cache")) do
-            sh("tar -cf #{dst} *.gem > /dev/null 2>&1", {:on_error => "Unable to package bosh gems"})
-          end
-          sh("tar -rf #{dst} *.gem > /dev/null 2>&1", {:on_error => "Unable to add bosh_agent gem to #{dst}"})
+          sh("tar -cf #{dst} *.gem > /dev/null 2>&1", {:on_error => "Unable to package bosh gems"})
         end
       else
         FileUtils.cp @agent_src_path, dst
