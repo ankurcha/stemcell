@@ -31,9 +31,7 @@ sed -i -e 's/^\(timeout=.*\)$/timeout=0/g' /boot/grub/grub.conf
 dpkg -l > $bosh_dir/stemcell_dpkg_l.out
 
 # Clean out all the scripts
-rm -f _60-bosh-sysctl.conf _monitrc _ntpdate _sysstat _empty_state.yml _variables.sh _helpers.sh _bosh_agent.tar
-rm -f timestamp.sh apt-upgrade.sh sudo.sh setup-bosh.sh base-stemcell.sh monit.sh ruby.sh bosh_agent.sh vmware-tools.sh network-cleanup.sh
-rm -f zero-disk.sh harden.sh postinstall.sh *.iso *.gem
+rm -f *.iso *.gem *.tar *.tgz
 
 # install runonce
 mkdir -p /etc/local/runonce.d/ran

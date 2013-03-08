@@ -4,6 +4,8 @@ require 'deep_merge'
 require 'erb'
 require 'securerandom'
 require 'digest/sha1'
+require 'net/scp'
+require 'net/ssh'
 
 module Bosh::Agent::StemCell
 
@@ -65,6 +67,7 @@ module Bosh::Agent::StemCell
       @gui = opts[:gui]
       @definitions_dir = opts[:definitions_dir]
       @stemcell_files = [] # List of files to be packaged into the stemcell
+      @micro = opts[:micro]
 
       if @iso
         unless @iso_md5
@@ -75,7 +78,12 @@ module Bosh::Agent::StemCell
         init_default_iso
       end
 
+      if micro?
+        initialize_micro(opts)
+      end
+
       sanity_check
+
     end
 
     # This method does the setup, this implementation takes care of copying over the
@@ -83,6 +91,10 @@ module Bosh::Agent::StemCell
     def setup
       copy_definitions
       package_agent
+    end
+
+    def micro?
+      !!@micro
     end
 
     # This method creates the vm using the #@name as the virtual machine name
@@ -104,7 +116,9 @@ module Bosh::Agent::StemCell
     end
 
     def pre_shutdown_hook
-      # nothing
+      if micro?
+        convert_stemcell_to_micro
+      end
     end
 
     def type
@@ -117,7 +131,7 @@ module Bosh::Agent::StemCell
 
     # Packages the stemcell contents (defined as the array of file path argument)
     def package_stemcell
-      @stemcell_files << generate_image << generate_manifest << stemcell_files
+      @stemcell_files << generate_image << generate_manifest
       # package up files
       package_files
     end
@@ -141,10 +155,6 @@ module Bosh::Agent::StemCell
         @image_sha1 = Digest::SHA1.file(image_path).hexdigest
       end
       image_path
-    end
-
-    def stemcell_files
-      # No extra stemcell files
     end
 
     # Main execution method that sets up the directory, builds the VM and packages everything into a stemcell
@@ -217,6 +227,14 @@ protected
 
       @logger.info "Checking definitions dir..."
       raise "Definition for '#{type}' does not exist at path '#{definition_dir}'" unless Dir.exist? definition_dir
+
+      if micro?
+        @logger.info "Checking micro stemcell conversion files"
+        raise "Micro conversion script does not exist." unless File.exists?(@micro_path)
+        raise "Release manifest path missing"           unless File.exists?(@release_manifest)
+        raise "Release tar path missing"                unless File.exists?(@release_tar)
+        raise "Package compiler path missing"           unless File.exists?(@package_compiler_tar)
+      end
     end
 
     # @param [Hash] opts Options: :silent => when set to true, it raises :on_error exception
@@ -247,17 +265,34 @@ protected
       }
     end
 
-    def ssh_download_file(source, destination)
-      require 'net/scp'
+    def filter_ssh_opts
+      opts = ssh_options.dup
+      opts.delete(:host) if opts.has_key?(:host)
+      opts.delete(:user) if opts.has_key?(:user)
+      opts
+    end
+
+    def ssh_execute(cmd)
+      @logger.info "Executing #{cmd} on vm"
+      Net::SSH.start(ssh_options[:host], ssh_options[:user], filter_ssh_opts) do |ssh|
+        ssh.exec! "echo '#{ssh_options[:password]}' | sudo -S /bin/bash '#{cmd}'"
+      end
+    end
+
+    def upload_file(source, destination=nil)
+      destination ||= "/home/#{ssh_options[:user]}"
+
+      @logger.info "Uploading #{source} to #{destination}"
+      Net::SCP.upload!(ssh_options[:host], ssh_options[:user], source, destination, filter_ssh_opts)
+    end
+
+    def download_file(source, destination=nil)
+      destination ||= File.join(@prefix, File.basename(source))
+
       @logger.info "Copying #{ssh_options[:user]}:#{ssh_options[:password]}@#{ssh_options[:host]}:#{ssh_options[:port]} #{source} > #{destination} "
       5.times do
         begin
-          opts = ssh_options.dup
-          opts.delete(:host) if opts.has_key?(:host)
-          opts.delete(:user) if opts.has_key?(:user)
-          Net::SCP.start(ssh_options[:host], ssh_options[:user], opts) do |scp|
-            return scp.download!(source, destination)
-          end
+          return Net::SCP.download!(ssh_options[:host], ssh_options[:user], source, destination, filter_ssh_opts)
         rescue => e
           @logger.info "Failed to download #{source}, ERROR: #{e.message}"
           @logger.info "Wait for 5 seconds"
@@ -323,10 +358,6 @@ private
       File.expand_path(@definition_dest_dir ||= File.join(@prefix, "definitions", @vm_name))
     end
 
-    def gui?
-      !!@gui
-    end
-
     def compile_erb(erb_file, dst_file=nil)
       new_file_path = dst_file || erb_file.gsub(/\.erb$/,'')
       @logger.debug "Compiling erb #{erb_file} to #{new_file_path}"
@@ -334,6 +365,56 @@ private
       File.open(new_file_path, "w"){|f|
         f.write(ERB.new(File.read(File.expand_path(erb_file))).result(binding))
       }
+    end
+
+    def gui?
+      !!@gui
+    end
+
+    def initialize_micro(opts)
+      #@bosh_src_root = opts[:bosh_src_root] || File.expand_path("bosh", @prefix)
+      @release_manifest = opts[:release_manifest] # || default_release_manifest
+      @release_tar = opts[:release_tar]
+      @package_compiler_tar = opts[:package_compiler]
+      @micro_path = opts[:micro_path] || File.join(definition_dir, "micro.sh")
+
+      # This is kind of a hack :(
+      if File.exists?(@package_compiler_tar) && File.directory?(@package_compiler_tar)
+        # Tar up the package
+        tmpdir = Dir.mktmpdir
+        tmp_package_compiler_tar = File.join(tmpdir, "_package_compiler.tar")
+        Dir.chdir(opts[:package_compiler]) do
+          sh "tar -cf #{tmp_package_compiler_tar} *"
+          @package_compiler_tar = tmp_package_compiler_tar
+        end
+      end
+
+    end
+
+    def build_all_deps
+      @logger.info "Build all bosh packages with dependencies from source"
+      @logger.info "Execute 'rake all:build_with_deps' in bosh/ directory"
+    end
+
+    def create_release_tarball
+      @logger.info("Copy bosh/release/config/microbosh-dev-template.yml to bosh/release/config/dev.yml")
+      @logger.info("Then execute 'bosh create release --force --with-tarball'")
+      @logger.info("The release tar will be in bosh/release/dev_releases/micro-bosh*.tgz")
+      @logger.info("The release manifest is at bosh/release/micro/vsphere.yml")
+    end
+
+    def convert_stemcell_to_micro
+      # SCP upload _release.tgz, _package_compiler.tar, _release.yml, micro.sh
+      upload_file @package_compiler_tar
+      upload_file @release_tar
+      upload_file @release_manifest
+      upload_file @micro_path
+      # SSH execute micro.sh
+      ssh_execute "./micro.sh"
+
+      # SCP download apply.spec
+      download_file "/var/vcap/micro/apply_spec.yml"
+      @stemcell_files << File.join(@prefix, "apply_spec.yml")
     end
 
   end
