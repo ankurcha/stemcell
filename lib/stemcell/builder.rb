@@ -6,6 +6,7 @@ require 'securerandom'
 require 'digest/sha1'
 require 'net/scp'
 require 'net/ssh'
+require 'retryable'
 
 module Bosh::Agent::StemCell
 
@@ -51,39 +52,9 @@ module Bosh::Agent::StemCell
     #  }
     #}
     def initialize(opts)
-      @logger = opts[:logger] || Logger.new(STDOUT)
-      @logger.level = Logger.const_get(opts[:log_level] || "INFO")
-      @name = opts[:name] || Bosh::Agent::StemCell::DEFAULT_STEMCELL_NAME
-      @vm_name = opts[:name] || SecureRandom.uuid.gsub(/-/,'')
-      @prefix = File.expand_path(opts[:prefix] || Dir.pwd)
-      @infrastructure = opts[:infrastructure] || Bosh::Agent::StemCell::DEFAULT_INFRASTRUCTURE
-      @architecture = opts[:architecture] || Bosh::Agent::StemCell::DEFAULT_ARCHITECTURE
-      @agent_version = opts[:agent_version] || Bosh::Agent::VERSION
-      @bosh_protocol = opts[:agent_protocol] || Bosh::Agent::BOSH_PROTOCOL
-      @agent_src_path = File.expand_path(opts[:agent_src_path] || "./bosh_agent-#{@agent_version}.gem")
-      @target ||= File.join(@prefix, "#@name-#{type}-#@infrastructure-#{@agent_version}.tgz")
-      @iso = opts[:iso]
-      @iso_md5 = opts[:iso_md5]
-      @gui = opts[:gui]
-      @definitions_dir = opts[:definitions_dir]
-      @stemcell_files = [] # List of files to be packaged into the stemcell
-      @micro = opts[:micro]
-
-      if @iso
-        unless @iso_md5
-          raise "MD5 must be specified is ISO is specified"
-        end
-        @iso_filename ||= File.basename @iso
-      else
-        init_default_iso
-      end
-
-      if micro?
-        initialize_micro(opts)
-      end
-
+      initialize_common(opts)
+      initialize_micro(opts) if micro?
       sanity_check
-
     end
 
     # This method does the setup, this implementation takes care of copying over the
@@ -283,24 +254,20 @@ protected
       destination ||= "/home/#{ssh_options[:user]}"
 
       @logger.info "Uploading #{source} to #{destination}"
-      Net::SCP.upload!(ssh_options[:host], ssh_options[:user], source, destination, filter_ssh_opts)
+      retryable(:tries => 5, :on => Net::SCP::Error, :sleep => 5) do
+        Net::SCP.upload!(ssh_options[:host], ssh_options[:user], source, destination, filter_ssh_opts)
+      end
     end
 
     def download_file(source, destination=nil)
       destination ||= File.join(@prefix, File.basename(source))
-
       @logger.info "Copying #{ssh_options[:user]}:#{ssh_options[:password]}@#{ssh_options[:host]}:#{ssh_options[:port]} #{source} > #{destination} "
-      5.times do
-        begin
-          return Net::SCP.download!(ssh_options[:host], ssh_options[:user], source, destination, filter_ssh_opts)
-        rescue => e
-          @logger.info "Failed to download #{source}, ERROR: #{e.message}"
-          @logger.info "Wait for 5 seconds"
-          sleep 5 # sleep for a while
-        end
+
+      retryable(:tries => 5, :on => Net::SCP::Error, :sleep => 5) do
+        Net::SCP.download!(ssh_options[:host], ssh_options[:user], source, destination, filter_ssh_opts)
       end
+
       @logger.warn "Unable to download #{source}" unless File.exists?(destination)
-      false
     end
 
 private
@@ -366,6 +333,33 @@ private
 
     def gui?
       !!@gui
+    end
+
+    def initialize_common(opts)
+      @logger = opts[:logger] || Logger.new(STDOUT)
+      @logger.level = Logger.const_get(opts[:log_level] || "INFO")
+      @name = opts[:name] || Bosh::Agent::StemCell::DEFAULT_STEMCELL_NAME
+      @vm_name = opts[:name] || SecureRandom.uuid.gsub(/-/,'')
+      @prefix = File.expand_path(opts[:prefix] || Dir.pwd)
+      @infrastructure = opts[:infrastructure] || Bosh::Agent::StemCell::DEFAULT_INFRASTRUCTURE
+      @architecture = opts[:architecture] || Bosh::Agent::StemCell::DEFAULT_ARCHITECTURE
+      @agent_version = opts[:agent_version] || Bosh::Agent::VERSION
+      @bosh_protocol = opts[:agent_protocol] || Bosh::Agent::BOSH_PROTOCOL
+      @agent_src_path = File.expand_path(opts[:agent_src_path] || "./bosh_agent-#{@agent_version}.gem")
+      @target ||= File.join(@prefix, "#@name-#{type}-#@infrastructure-#{@agent_version}.tgz")
+      @iso = opts[:iso]
+      @iso_md5 = opts[:iso_md5]
+      @gui = opts[:gui]
+      @definitions_dir = opts[:definitions_dir]
+      @stemcell_files = [] # List of files to be packaged into the stemcell
+      @micro = opts[:micro]
+
+      if @iso
+        raise "MD5 must be specified is ISO is specified" unless @iso_md5
+        @iso_filename ||= File.basename @iso
+      else
+        init_default_iso
+      end
     end
 
     def initialize_micro(opts)
