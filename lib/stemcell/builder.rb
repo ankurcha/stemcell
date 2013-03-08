@@ -92,7 +92,7 @@ module Bosh::Agent::StemCell
         @logger.info "Building vm #@name"
         nogui_str = gui? ? "" : "--nogui"
 
-        execute_veewee_cmd "build '#@vm_name' --force --auto #{nogui_str}", {:on_error => "Unable to build vm #@name"}
+        sh "veewee vbox build '#@vm_name' --force --auto #{nogui_str}", {:on_error => "Unable to build vm #@name"}
 
         # execute pre-shutdown hook
         pre_shutdown_hook
@@ -189,17 +189,6 @@ protected
         end
       end
       return nil
-    end
-
-    # Execute the provide veewee command and return the exit status
-    #
-    # @param [String] command Execute the specified veewee command in @prefix
-    # @@return Exitstatus of the Kernel#system command
-    # @param [Hash] opts Options: :silent => when set to true, it raises :on_error exception
-    def execute_veewee_cmd(command="", opts={})
-      cmd = "veewee vbox #{command}"
-      @logger.debug "Executing: #{cmd}"
-      sh cmd, opts
     end
 
     # Package all files specified as arguments into a tar. The output file is specified by the :target option
@@ -321,7 +310,8 @@ private
 
       # Compile erb files
       Dir.glob(File.join(definition_dest_dir, '*.erb')) { |erb_file|
-        compile_erb(erb_file)
+        compile_erb(erb_file) # compile erb
+        FileUtils.rm erb_file # remove original
       }
     end
 

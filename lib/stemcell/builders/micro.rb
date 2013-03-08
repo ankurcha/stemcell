@@ -20,17 +20,24 @@ module Bosh::Agent::StemCell
       #@bosh_src_root = opts[:bosh_src_root] || File.expand_path("bosh", @prefix)
       @release_manifest = opts[:release_manifest] # || default_release_manifest
       @release_tar = opts[:release_tar]
+      if @release_manifest.nil? || @release_tar.nil?
+        build_all_deps
+        create_release_tarball
+        exit 1
+      end
+
+      raise "Package compiler location required" if opts[:package_compiler].nil?
       # This is kind of a hack :(
-      if opts[:package_compiler_tar] && File.directory?(opts[:package_compiler_tar])
+      if opts[:package_compiler] && File.directory?(opts[:package_compiler])
         # Tar up the package
         tmpdir = Dir.mktmpdir
         tmp_package_compiler_tar = File.join(tmpdir, "_package_compiler.tar")
-        Dir.chdir(opts[:package_compiler_tar]) do
+        Dir.chdir(opts[:package_compiler]) do
           sh "tar -cf #{tmp_package_compiler_tar} *"
           @package_compiler_tar = tmp_package_compiler_tar
         end
       else
-        @package_compiler_tar = File.expand_path(opts[:package_compiler_tar])
+        @package_compiler_tar = File.expand_path(opts[:package_compiler])
       end
 
       unless File.exists?(@release_manifest) && File.exists?(@release_tar) && File.exists?(@package_compiler_tar)
@@ -56,6 +63,7 @@ module Bosh::Agent::StemCell
       @logger.info("Copy bosh/release/config/microbosh-dev-template.yml to bosh/release/config/dev.yml")
       @logger.info("Then execute 'bosh create release --force --with-tarball'")
       @logger.info("The release tar will be in bosh/release/dev_releases/micro-bosh*.tgz")
+      @logger.info("The release manifest is at bosh/release/micro/vsphere.yml")
     end
 
     def pre_shutdown_hook

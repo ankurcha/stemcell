@@ -1,3 +1,5 @@
+require 'stemcell/builder'
+
 module Bosh::Agent::StemCell
 
   class RedhatBuilder < BaseBuilder

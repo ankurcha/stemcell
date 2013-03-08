@@ -64,7 +64,7 @@ module StemCellBuilderCLI
                                      :desc => "Micro Bosh release manifest, generally <bosh_src_root>/release/micro/<infrastructure>.yml"
     method_option :release_tar,      :banner => "<precompiled_release_tar>", :type => :string,
                                      :desc => "Precompiled micro Bosh release tar archive"
-    method_option :package_compiler_tar, :banner => "<package_compiler>", :type => :string,
+    method_option :package_compiler, :banner => "<package_compiler>", :type => :string,
                                      :desc => "Path to Bosh package compiler gems, generally <bosh_src_root>/release/src/bosh/package_compiler/"
     def micro
       Bosh::Agent::StemCell::MicroUbuntuBuilder.new(options.dup).run

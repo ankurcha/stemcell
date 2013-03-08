@@ -1,3 +1,5 @@
+require 'stemcell/builder'
+
 module Bosh::Agent::StemCell
 
   # This is concrete Stemcell builder for creating a Centos stemcell
