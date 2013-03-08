@@ -316,9 +316,10 @@ private
     # Packages the agent into a bosh_agent gem and copies it over to definition_dest_dir
     # so that it can be used as a part of the VM building process by veewee (using the definition).
     def package_agent
-      @logger.debug "Packaging Bosh Agent to #{definition_dest_dir}/_bosh_agent.tar"
+      @logger.info "Packaging Bosh Agent to #{definition_dest_dir}/_bosh_agent.tar"
       dst = File.join(definition_dest_dir, "_bosh_agent.tar")
       if File.directory? @agent_src_path
+        @logger.info "Tarring up Bosh Agent"
         Dir.chdir(@agent_src_path) do
           sh("tar -cf #{dst} *.gem > /dev/null 2>&1", {:on_error => "Unable to package bosh gems"})
         end
