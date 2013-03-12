@@ -16,9 +16,9 @@ popd
 
 # install ruby and rubygems
 pushd /tmp
-	[ ! -f "ruby-1.9.3-p374.tar.gz" ] && wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p374.tar.gz
-    tar zxf ruby-1.9.3-p374.tar.gz
-    cd ruby-1.9.3-p374
+    [ ! -f "ruby-1.9.3-p392.tar.gz" ] && wget http://mirrors.ibiblio.org/ruby/ruby-1.9.3-p392.zip
+    tar zxf ruby-1.9.3-p392.tar.gz
+    cd ruby-1.9.3-p392
     ./configure --prefix=$bosh_dir --disable-install-doc
     make
     make install

@@ -10,11 +10,12 @@ apt-get -y install build-essential zlib1g-dev libssl-dev libxml2-dev libxslt-dev
 pushd /tmp
 	if [ ! -f "$bosh_dir/bin/ruby" ]
 	then
-	    [ ! -f "ruby-1.9.3-p385.tar.gz" ] && wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p385.tar.gz
-		tar zxf ruby-1.9.3-p385.tar.gz
-		cd ruby-1.9.3-p385
-		./configure --prefix=$bosh_dir --disable-install-doc --enable-pthread --enable-shared
-		make && make install
+	    [ ! -f "ruby-1.9.3-p392.tar.gz" ] && wget http://mirrors.ibiblio.org/ruby/ruby-1.9.3-p392.zip
+        tar zxf ruby-1.9.3-p392.tar.gz
+        cd ruby-1.9.3-p392
+        ./configure --prefix=$bosh_dir --disable-install-doc
+        make
+        make install
 	fi
 popd
 # Install rubygems
