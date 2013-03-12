@@ -77,8 +77,8 @@ module Bosh::Agent::StemCell
 
         sh "veewee vbox build '#@vm_name' --force --auto #{nogui_str}", {:on_error => "Unable to build vm #@name"}
 
-        # execute pre-shutdown hook
-        pre_shutdown_hook
+        # execute pre-shutdown hooks
+        execute_pre_shutdown_hooks
 
         @logger.info "Export built VM #@name to #@prefix"
         sh "vagrant basebox export '#@vm_name' --force", {:on_error => "Unable to export VM #@name: vagrant basebox export '#@vm_name'"}
@@ -86,10 +86,12 @@ module Bosh::Agent::StemCell
 
     end
 
-    def pre_shutdown_hook
-      if micro?
-        convert_stemcell_to_micro
-      end
+    def execute_pre_shutdown_hooks
+      @pre_shutdown_hooks.each{|hook| hook.call() } unless @pre_shutdown_hooks.empty?
+    end
+
+    def add_pre_shutdown_hook(code)
+      @pre_shutdown_hooks << code
     end
 
     def type
@@ -353,6 +355,7 @@ private
       @definitions_dir = opts[:definitions_dir]
       @stemcell_files = [] # List of files to be packaged into the stemcell
       @micro = opts[:micro]
+      @pre_shutdown_hooks = []
 
       if @iso
         raise "MD5 must be specified is ISO is specified" unless @iso_md5
@@ -380,7 +383,8 @@ private
           @package_compiler_tar = tmp_package_compiler_tar
         end
       end
-
+      # Add pre-shutdown hook for micro stemcell conversion
+      add_pre_shutdown_hook micro_stemcell_lambda
     end
 
     def build_all_deps
@@ -395,18 +399,20 @@ private
       @logger.info("The release manifest is at bosh/release/micro/vsphere.yml")
     end
 
-    def convert_stemcell_to_micro
-      # SCP upload _release.tgz, _package_compiler.tar, _release.yml, micro.sh
-      upload_file @package_compiler_tar
-      upload_file @release_tar
-      upload_file @release_manifest
-      upload_file @micro_path
-      # SSH execute micro.sh
-      ssh_execute "./micro.sh"
+    def micro_stemcell_lambda
+      lambda {
+        # SCP upload _release.tgz, _package_compiler.tar, _release.yml, micro.sh
+        upload_file @package_compiler_tar
+        upload_file @release_tar
+        upload_file @release_manifest
+        upload_file @micro_path
+        # SSH execute micro.sh
+        ssh_execute "./micro.sh"
 
-      # SCP download apply.spec
-      download_file "/var/vcap/micro/apply_spec.yml"
-      @stemcell_files << File.join(@prefix, "apply_spec.yml")
+        # SCP download apply.spec
+        download_file "/var/vcap/micro/apply_spec.yml"
+        @stemcell_files << File.join(@prefix, "apply_spec.yml")
+      }
     end
 
   end

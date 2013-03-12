@@ -22,9 +22,9 @@ module Bosh::Agent::StemCell
       @iso_filename = "ubuntu-11.04-server-amd64.iso"
     end
 
-    def pre_shutdown_hook
-      super()
-      download_file("/var/vcap/bosh/stemcell_dpkg_l.out")
+    def initialize(opts)
+      super(opts)
+      add_pre_shutdown_hook lambda{ download_file("/var/vcap/bosh/stemcell_dpkg_l.out") }
     end
 
     def stemcell_files

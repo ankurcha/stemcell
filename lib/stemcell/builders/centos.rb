@@ -16,11 +16,13 @@ module Bosh::Agent::StemCell
       "centos"
     end
 
-    def pre_shutdown_hook
-      super()
-      download_file "/var/vcap/bosh/stemcell_yum_list_installed.out"
-      # add file to the list of files to be packaged
-      @stemcell_files << File.join(@prefix, "stemcell_yum_list_installed.out")
+    def initialize(opts)
+      super(opts)
+      add_pre_shutdown_hook lambda{
+        # add file to the list of files to be packaged
+        download_file "/var/vcap/bosh/stemcell_yum_list_installed.out"
+        @stemcell_files << File.join(@prefix, "stemcell_yum_list_installed.out")
+      }
     end
 
     def init_default_iso
