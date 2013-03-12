@@ -254,7 +254,7 @@ protected
       destination ||= "/home/#{ssh_options[:user]}"
 
       @logger.info "Uploading #{source} to #{destination}"
-      retryable(:tries => 5, :on => Net::SCP::Error, :sleep => 5) do
+      retryable(:tries => 5, :sleep => 5) do
         Net::SCP.upload!(ssh_options[:host], ssh_options[:user], source, destination, filter_ssh_opts)
       end
     end
@@ -263,7 +263,7 @@ protected
       destination ||= File.join(@prefix, File.basename(source))
       @logger.info "Copying #{ssh_options[:user]}:#{ssh_options[:password]}@#{ssh_options[:host]}:#{ssh_options[:port]} #{source} > #{destination} "
 
-      retryable(:tries => 5, :on => Net::SCP::Error, :sleep => 5) do
+      retryable(:tries => 5, :sleep => 5) do
         Net::SCP.download!(ssh_options[:host], ssh_options[:user], source, destination, filter_ssh_opts)
       end
 
