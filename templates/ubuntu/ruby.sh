@@ -4,7 +4,8 @@ set -x
 source _variables.sh
 
 ### stage bosh_ruby
-apt-get -y install build-essential zlib1g-dev libssl-dev libxml2-dev libxslt-dev libreadline6-dev libyaml-dev libffi-dev
+apt-get -y update
+apt-get -y install build-essential zlib1g-dev libssl-dev libxml2-dev libxslt-dev libreadline6-dev libyaml-dev
 
 # install ruby
 pushd /tmp
