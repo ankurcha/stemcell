@@ -253,20 +253,23 @@ protected
     def upload_file(source, destination=nil)
       destination ||= "/home/#{ssh_options[:user]}"
 
-      @logger.info "Uploading #{source} to #{destination}"
       retryable(:tries => 5, :sleep => 5) do
-        Net::SCP.upload!(ssh_options[:host], ssh_options[:user], source, destination, filter_ssh_opts)
+        @logger.info "Attempting to upload #{source} to #{destination} [ options: #{ssh_options} ]"
+        Net::SCP.start(ssh_options[:host], ssh_options[:user], filter_ssh_opts) do |scp|
+          scp.upload!(source, destination)
+        end
       end
     end
 
     def download_file(source, destination=nil)
       destination ||= File.join(@prefix, File.basename(source))
-      @logger.info "Copying #{ssh_options[:user]}:#{ssh_options[:password]}@#{ssh_options[:host]}:#{ssh_options[:port]} #{source} > #{destination} "
 
       retryable(:tries => 5, :sleep => 5) do
-        Net::SCP.download!(ssh_options[:host], ssh_options[:user], source, destination, filter_ssh_opts)
+        Net::SCP.start(ssh_options[:host], ssh_options[:user], filter_ssh_opts) do |scp|
+          @logger.info "Attempting to download #{source} to #{destination} [ options: #{ssh_options} ]"
+          scp.download!(source, destination)
+        end
       end
-
       @logger.warn "Unable to download #{source}" unless File.exists?(destination)
     end
 
