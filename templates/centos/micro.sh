@@ -1,6 +1,10 @@
 #!/bin/bash
+set -x
 
-source _variables.sh
+bosh_app_dir=/var/vcap
+bosh_dir=${bosh_app_dir}/bosh
+infrastructure="vsphere"
+SRC_DIR=`pwd`
 
 blobstore_path=${bosh_app_dir}/micro_bosh/data/cache
 agent_host=localhost
@@ -9,7 +13,7 @@ agent_uri=http://vcap:vcap@${agent_host}:${agent_port}
 export PATH=${bosh_app_dir}/bosh/bin:$PATH
 
 # Packages
-yum -y install mkisofs genisoimage postgresql-libs postgresql-devel
+yum -y install mkisofs genisoimage postgresql-libs postgresql-devel boost boost-devel mysql mysql-devel lua lua-devel nc
 
 # Install package compiler
 mkdir -p /tmp/package_compiler

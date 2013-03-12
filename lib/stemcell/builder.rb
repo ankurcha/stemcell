@@ -187,6 +187,9 @@ protected
     def sanity_check
       @logger.info "Sanity check"
 
+      @logger.info "Checking ssh_port"
+      raise "Unable to find port for ssh" if @ssh_port.nil?
+
       @logger.info "Checking target file: #@target..."
       if File.exists? @target
         @logger.warn "Target file #@target exists. Moving old file to #@target.bak."
@@ -206,6 +209,7 @@ protected
         raise "Release tar path missing"                unless File.exists?(@release_tar)
         raise "Package compiler path missing"           unless File.exists?(@package_compiler_tar)
       end
+
     end
 
     # @param [Hash] opts Options: :silent => when set to true, it raises :on_error exception
@@ -230,7 +234,7 @@ protected
           :host => '127.0.0.1',
           :user => 'vcap',
           :password => 'c1oudc0w',
-          :port => '7222',
+          :port => @ssh_port,
           :paranoid => false,
           :timeout => 30
       }
@@ -244,19 +248,24 @@ protected
     end
 
     def ssh_execute(cmd)
-      @logger.info "Executing #{cmd} on vm"
+      @logger.info "Executing #{cmd} on VM [ options: #{filter_ssh_opts} ]"
       Net::SSH.start(ssh_options[:host], ssh_options[:user], filter_ssh_opts) do |ssh|
-        ssh.exec! "echo '#{ssh_options[:password]}' | sudo -S /bin/bash '#{cmd}'"
+        ssh.exec! "echo '#{ssh_options[:password]}' | sudo -S /bin/bash '#{cmd}'" do |ch, stream, line|
+          @logger.info line
+        end
       end
     end
 
     def upload_file(source, destination=nil)
       destination ||= "/home/#{ssh_options[:user]}"
 
-      retryable(:tries => 5, :sleep => 5) do
-        @logger.info "Attempting to upload #{source} to #{destination} [ options: #{ssh_options} ]"
+      retryable(:tries => 5, :sleep => 5) do |retries, exception|
+        @logger.warn "Failed to upload :#{exception}" unless exception.nil?
+        @logger.info "Attempting to upload #{source} to #{destination} [ options: #{filter_ssh_opts} ]"
         Net::SCP.start(ssh_options[:host], ssh_options[:user], filter_ssh_opts) do |scp|
-          scp.upload!(source, destination)
+          scp.upload!(source, destination) do|ch, name, sent, total|
+            print "\r#{name}: #{(sent.to_f * 100 / total.to_f).to_i}%"
+          end
         end
       end
     end
@@ -264,16 +273,31 @@ protected
     def download_file(source, destination=nil)
       destination ||= File.join(@prefix, File.basename(source))
 
-      retryable(:tries => 5, :sleep => 5) do
+      retryable(:tries => 5, :sleep => 5) do |retries, exception|
+        @logger.warn "Failed to download :#{exception}" unless exception.nil?
+        @logger.info "Attempting to download #{source} to #{destination} [ options: #{filter_ssh_opts} ]"
         Net::SCP.start(ssh_options[:host], ssh_options[:user], filter_ssh_opts) do |scp|
-          @logger.info "Attempting to download #{source} to #{destination} [ options: #{ssh_options} ]"
-          scp.download!(source, destination)
+          scp.download!(source, destination) do|ch, name, sent, total|
+            print "\r#{name}: #{(sent.to_f * 100 / total.to_f).to_i}%"
+          end
         end
       end
       @logger.warn "Unable to download #{source}" unless File.exists?(destination)
     end
 
 private
+
+    def get_free_port
+      port = nil
+      begin
+        socket = Socket.new(Socket::AF_INET, Socket::SOCK_STREAM, 0)
+        socket.bind(Addrinfo.tcp("127.0.0.1", 0))
+        port = socket.local_address.ip_port
+      ensure
+        socket.close
+      end
+      port
+    end
 
     # HACK: This is a compatibility hack for virtualbox-esx compatibility
     def fix_virtualbox_ovf(filepath, vmdk_filename="box-disk1.vmdk")
@@ -356,6 +380,7 @@ private
       @definitions_dir = opts[:definitions_dir]
       @stemcell_files = [] # List of files to be packaged into the stemcell
       @micro = opts[:micro]
+      @ssh_port = opts[:ssh_port] || get_free_port()
 
       if @iso
         raise "MD5 must be specified is ISO is specified" unless @iso_md5
@@ -400,12 +425,12 @@ private
 
     def convert_stemcell_to_micro
       # SCP upload _release.tgz, _package_compiler.tar, _release.yml, micro.sh
-      upload_file @package_compiler_tar
-      upload_file @release_tar
-      upload_file @release_manifest
-      upload_file @micro_path
+      upload_file @package_compiler_tar, "/home/vcap/_package_compiler.tgz"
+      upload_file @release_tar, "/home/vcap/_release.tgz"
+      upload_file @release_manifest, "/home/vcap/_release.yml"
+      upload_file @micro_path, "/home/vcap/micro.sh"
       # SSH execute micro.sh
-      ssh_execute "./micro.sh"
+      @logger.info ssh_execute("./micro.sh")
 
       # SCP download apply.spec
       download_file "/var/vcap/micro/apply_spec.yml"

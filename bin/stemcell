@@ -44,6 +44,8 @@ module StemCellBuilderCLI
                                     :desc => "Precompiled micro Bosh release tar archive"
     class_option :package_compiler, :banner => "<package_compiler>",
                                     :desc => "Path to Bosh package compiler gems, generally <bosh_src_root>/release/src/bosh/package_compiler/"
+    class_option :ssh_port,         :banner => "<ssh_host_port>",
+                                    :desc => "Port to use for the ssh tunnel to the vm, if nothing is specified a random open port will be selected"
 
     desc "ubuntu", "Build a new ubuntu stemcell"
     def ubuntu
