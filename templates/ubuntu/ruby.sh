@@ -7,6 +7,16 @@ source _variables.sh
 apt-get -y update
 apt-get -y install build-essential zlib1g-dev libssl-dev libxml2-dev libxslt-dev libreadline6-dev libyaml-dev
 
+# install libyaml
+pushd /tmp
+	[ ! -f "yaml-0.1.4.tar.gz" ] && wget http://pyyaml.org/download/libyaml/yaml-0.1.4.tar.gz
+    tar zxf yaml-0.1.4.tar.gz
+    cd yaml-0.1.4
+    ./configure
+    make
+    make install
+popd
+
 # install ruby
 pushd /tmp
 	if [ ! -f "$bosh_dir/bin/ruby" ]
