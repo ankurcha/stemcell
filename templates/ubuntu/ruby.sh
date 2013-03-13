@@ -5,18 +5,28 @@ source _variables.sh
 
 ### stage bosh_ruby
 apt-get -y update
-apt-get -y autoremove
-apt-get -y install build-essential zlib1g-dev libssl-dev libxml2-dev libxslt-dev libreadline6-dev libyaml-dev libffi-dev
+apt-get -y install build-essential zlib1g-dev libssl-dev libxml2-dev libxslt-dev libreadline6-dev libyaml-dev
+
+# install libyaml
+pushd /tmp
+	[ ! -f "yaml-0.1.4.tar.gz" ] && wget http://pyyaml.org/download/libyaml/yaml-0.1.4.tar.gz
+    tar zxf yaml-0.1.4.tar.gz
+    cd yaml-0.1.4
+    ./configure
+    make
+    make install
+popd
 
 # install ruby
 pushd /tmp
 	if [ ! -f "$bosh_dir/bin/ruby" ]
 	then
-	    [ ! -f "ruby-1.9.3-p385.tar.gz" ] && wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p385.tar.gz
-		tar zxf ruby-1.9.3-p385.tar.gz
-		cd ruby-1.9.3-p385
-		./configure --prefix=$bosh_dir --disable-install-doc --enable-pthread --enable-shared
-		make && make install
+        [ ! -f "ruby-1.9.3-p374.tar.gz" ] && wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p374.tar.gz
+        tar zxf ruby-1.9.3-p374.tar.gz
+        cd ruby-1.9.3-p374
+        ./configure --prefix=$bosh_dir --disable-install-doc
+        make
+        make install
 	fi
 popd
 # Install rubygems

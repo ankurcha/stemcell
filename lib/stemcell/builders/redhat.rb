@@ -1,6 +1,12 @@
+require 'stemcell/builders/centos'
+
 module Bosh::Agent::StemCell
 
-  class RedhatBuilder < BaseBuilder
+  class RedhatBuilder < CentosBuilder
+
+    def type
+      "redhat"
+    end
 
     def initialize(opts)
       @rhn_user ||= opts[:rhn_user]
@@ -16,10 +22,6 @@ module Bosh::Agent::StemCell
       unless @rhn_pass
         @logger.warn "Redhat Network Password is not specified"
       end
-    end
-
-    def type
-      "redhat"
     end
 
     def init_default_iso

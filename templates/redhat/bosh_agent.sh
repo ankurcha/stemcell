@@ -12,6 +12,8 @@ pushd /tmp/bosh_agent
 
     # configure bosh agent
     mkdir -p /etc/sv/agent/log
+    mkdir -p /var/vcap/bosh/log
+
     echo '#!/bin/bash
     export PATH=/var/vcap/bosh/bin:$PATH
     exec 2>&1
