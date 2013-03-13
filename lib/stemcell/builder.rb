@@ -60,8 +60,8 @@ module Bosh::Agent::StemCell
     # This method does the setup, this implementation takes care of copying over the
     # correct definition files, packaging the agent and doing any related setup if needed
     def setup
-      #copy_definitions
-      #package_agent
+      copy_definitions
+      package_agent
     end
 
     def micro?
@@ -75,7 +75,7 @@ module Bosh::Agent::StemCell
         @logger.info "Building vm #@name"
         nogui_str = gui? ? "" : "--nogui"
 
-        #sh "veewee vbox build '#@vm_name' --force --auto #{nogui_str}", {:on_error => "Unable to build vm #@name"}
+        sh "veewee vbox build '#@vm_name' --force --auto #{nogui_str}", {:on_error => "Unable to build vm #@name"}
 
         # execute pre-shutdown hook
         pre_shutdown_hook
@@ -234,7 +234,7 @@ protected
           :host => '127.0.0.1',
           :user => 'vcap',
           :password => 'c1oudc0w',
-          :port => 64755, #@ssh_port,
+          :port => @ssh_port,
           :paranoid => false,
           :timeout => 30
       }
