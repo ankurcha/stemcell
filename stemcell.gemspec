@@ -6,10 +6,10 @@ require "stemcell/version"
 Gem::Specification.new do |gem|
   gem.name                        = "stemcell"
   gem.version                     = Bosh::Agent::StemCell::VERSION
-  gem.authors                     = ["Ankur Chauhan", "Anfernee Yongkun Gui"]
-  gem.email                       = ["ankurc@vmware.com", "agui@vmware.com"]
+  gem.authors                     = ["Ankur Chauhan"]
+  gem.email                       = ["ankur@malloc64.com"]
   gem.description                 = "Stemcell builder for Bosh"
-  gem.summary                     = "A commandline utility for creating stemcells for Bosh [ http://www.github.com/ankurcha/stemcell ]"
+  gem.summary                     = "A commandline utility for creating stemcells for Bosh [ http://www.github.com/cloudfoundry/bosh ]"
   gem.homepage                    = "http://www.github.com/ankurcha/stemcell"
   gem.license                     = "MIT"
 
