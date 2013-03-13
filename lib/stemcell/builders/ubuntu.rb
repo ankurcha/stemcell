@@ -1,3 +1,5 @@
+require 'stemcell/builder'
+
 module Bosh::Agent::StemCell
 
   # This is concrete Stemcell builder for creating a Ubuntu stemcell
@@ -21,7 +23,8 @@ module Bosh::Agent::StemCell
     end
 
     def pre_shutdown_hook
-      ssh_download_file("/var/vcap/bosh/stemcell_dpkg_l.out", File.join(@prefix, "stemcell_dpkg_l.out"))
+      super()
+      download_file("/var/vcap/bosh/stemcell_dpkg_l.out")
     end
 
     def stemcell_files

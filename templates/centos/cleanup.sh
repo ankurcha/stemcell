@@ -25,6 +25,4 @@ sed -i -e 's/^\(timeout=.*\)$/timeout=0/g' /boot/grub/grub.conf
 /usr/local/bin/runonce "ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N ''"
 
 # Clean out all the scripts
-rm -f _60-bosh-sysctl.conf _monitrc _ntpdate _sysstat _empty_state.yml _variables.sh _helpers.sh _bosh_agent.tar _runonce
-rm -f base.sh sudo.sh setup-bosh.sh monit.sh ruby.sh bosh_agent.sh vmware-tools.sh harden.sh timestamp.sh postinstall.sh cleanup.sh zerodisk.sh
-rm -f *.iso *.gem
+rm -f *.iso *.gem *.tar *.tgz
