@@ -15,13 +15,16 @@ export PATH=${bosh_app_dir}/bosh/bin:$PATH
 # Packages
 yum -y install mkisofs genisoimage postgresql-libs postgresql-devel boost boost-devel mysql mysql-devel lua lua-devel nc
 
-# Install package compiler
-mkdir -p /tmp/package_compiler
-pushd /tmp/package_compiler
-    cp $SRC_DIR/_package_compiler.tar .
-    tar -xvf _package_compiler.tar
-    $bosh_dir/bin/gem install *.gem --no-ri --no-rdoc --local
-popd
+# Install package compiler if not already installed
+if [ ! -f "$bosh_dir/bin/package_compiler" ]
+then
+    mkdir -p /tmp/package_compiler
+    pushd /tmp/package_compiler
+        cp $SRC_DIR/_package_compiler.tar .
+        tar -xvf _package_compiler.tar
+        $bosh_dir/bin/gem install *.gem --no-ri --no-rdoc --local
+    popd
+fi
 
 mkdir -p ${bosh_app_dir}/bosh/blob
 mkdir -p ${blobstore_path}

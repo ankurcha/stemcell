@@ -16,12 +16,15 @@ export PATH=${bosh_app_dir}/bosh/bin:$PATH
 apt-get -y install genisoimage libpq-dev nc g++ libboost-program-options-dev libboost-serialization-dev libpqclient-dev libmysqlclient-dev libsqlite3-dev
 
 # Install package compiler
-mkdir -p /tmp/package_compiler
-pushd /tmp/package_compiler
-    cp $SRC_DIR/_package_compiler.tar .
-    tar -xvf _package_compiler.tar
-    $bosh_dir/bin/gem install *.gem --no-ri --no-rdoc --local
-popd
+if [ ! -f "$bosh_dir/bin/package_compiler" ]
+then
+    mkdir -p /tmp/package_compiler
+    pushd /tmp/package_compiler
+        cp $SRC_DIR/_package_compiler.tar .
+        tar -xvf _package_compiler.tar
+        $bosh_dir/bin/gem install *.gem --no-ri --no-rdoc --local
+    popd
+fi
 
 mkdir -p ${bosh_app_dir}/bosh/blob
 mkdir -p ${blobstore_path}
