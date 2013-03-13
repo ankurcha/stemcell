@@ -118,7 +118,7 @@ module Bosh::Agent::StemCell
     def generate_image
       image_path = File.join @prefix, "image"
       Dir.chdir(@prefix) do
-        sh("tar -xvf #@vm_name.box", {:on_error => "Unable to unpack .box file"})
+        sh("tar -xf #@vm_name.box", {:on_error => "Unable to unpack .box file"})
         vmdk_filename = Dir.glob("*.vmdk").first
         Dir.glob("*.ovf") { |ovf_file| fix_virtualbox_ovf(ovf_file, vmdk_filename) } # Fix ovf files
         sh("tar -czf #{image_path} *.vmdk *.ovf", {:on_error=>"Unable to create image file from ovf and vmdk"})
