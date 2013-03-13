@@ -68,8 +68,9 @@ In case of a redhat installation, the following additional options are available
 
 ## TODO
 This tool is in pre-alpha and supports only a small subset of operations. Currently, the tool is targeted
-to be able to create vsphere templates for ubuntu and centOS6. The following is a list of things
+to be able to create vsphere templates for ubuntu and centOS 6.x. The following is a list of things
 that need to be done before we can call it ready for primetime (in order of priority).
+* Add Micro cloudfoundry build support
 * Support AWS
 * Support Openstack
 
