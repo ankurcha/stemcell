@@ -18,26 +18,26 @@ Install vagrant
 
 Install stemcell builder
 
-    $ gem install stemcell
+    $ gem install stemcell_builder
 
 ## Usage
 
 The following is a listing of commands
 ```
 Tasks:
-  stemcell build SUBCOMMAND ...ARGS  # Build a new stemcell
-  stemcell help [TASK]               # Describe available tasks or one specific task
-  stemcell info <file>               # Display stemcell information, it looks for stemcell file name <file>
-  stemcell validate <file>           # Validate stemcell, it looks for stemcell file name <file>
+  stemcell_builder build SUBCOMMAND ...ARGS  # Build a new stemcell
+  stemcell_builder help [TASK]               # Describe available tasks or one specific task
+  stemcell_builder info <file>               # Display stemcell information, it looks for stemcell file name <file>
+  stemcell_builder validate <file>           # Validate stemcell, it looks for stemcell file name <file>
 ```
 The `stemcell build` command gives the following options
 
 ```
 Tasks:
-  stemcell build centos          # Build a new centos stemcell
-  stemcell build help [COMMAND]  # Describe subcommands or one specific subco...
-  stemcell build redhat          # Build a new redhat stemcell
-  stemcell build ubuntu          # Build a new ubuntu stemcell
+  stemcell_builder build centos          # Build a new centos stemcell
+  stemcell_builder build help [COMMAND]  # Describe subcommands or one specific subco...
+  stemcell_builder build redhat          # Build a new redhat stemcell
+  stemcell_builder build ubuntu          # Build a new ubuntu stemcell
 
 Options:
   [--name=<name>]                              # Name of the stemcell
@@ -67,7 +67,7 @@ In case of a redhat installation, the following additional options are available
 ```
 
 ## TODO
-This tool is in pre-alpha and supports only a small subset of operations. Currently, the tool is targeted
+This tool supports only a small subset of operations. Currently, the tool is targeted
 to be able to create vsphere templates for ubuntu and centOS 6.x. The following is a list of things
 that need to be done before we can call it ready for primetime (in order of priority).
 * Add Micro cloudfoundry build support
