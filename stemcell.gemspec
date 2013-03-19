@@ -4,7 +4,7 @@ $:.unshift(File.join(File.dirname(__FILE__), 'lib'))
 require "stemcell/version"
 
 Gem::Specification.new do |gem|
-  gem.name                        = "stemcell"
+  gem.name                        = "stemcell_builder"
   gem.version                     = Bosh::Agent::StemCell::VERSION
   gem.authors                     = ["Ankur Chauhan"]
   gem.email                       = ["ankur@malloc64.com"]
