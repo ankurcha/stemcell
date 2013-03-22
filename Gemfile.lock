@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    stemcell_builder (1.0.2)
+    stemcell_builder (1.0.3)
       deep_merge (~> 1.0.0)
       kwalify (~> 0.7.2)
       logger-colors (~> 1.0.0)
