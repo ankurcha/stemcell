@@ -7,7 +7,7 @@ source 'https://rubygems.org'
 
 # development and test dependencies
 group :test do
-	gem 'rspec'
+	gem 'rake'
 end
 
 # Specify your gem's dependencies in builder.gemspec
