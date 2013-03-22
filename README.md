@@ -1,6 +1,11 @@
 # Builder [![Build Status](https://travis-ci.org/ankurcha/stemcell.png?branch=master)](https://travis-ci.org/ankurcha/stemcell)
 
-The stemcell builder is a commandline tool to create new [Bosh](https://www.github.com/cloudfoundry/bosh) stemcells. This product is under active development and definitely needs work. Expect things to broken and feel free to open bugs/issues. I will get to them as soon as possible.
+The stemcell builder is a commandline tool to create new [BOSH](https://www.github.com/cloudfoundry/bosh) stemcells. 
+
+You can get more infomation about BOSH at [https://www.github.com/cloudfoundry/bosh](https://www.github.com/cloudfoundry/bosh).
+
+    This product is under active development and definitely needs work. 
+    Expect things to broken and feel free to open bugs/issues. I will get to them as soon as possible.
 
 ## Installation
 
