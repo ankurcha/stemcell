@@ -1,24 +1,37 @@
-# Builder [![Build Status](https://travis-ci.org/ankurcha/stemcell.png?branch=master)](https://travis-ci.org/ankurcha/stemcell) [![Code Climate](https://codeclimate.com/github/ankurcha/stemcell.png)](https://codeclimate.com/github/ankurcha/stemcell) [![Dependency Status](https://gemnasium.com/ankurcha/stemcell.png)](https://gemnasium.com/ankurcha/stemcell)
+# Builder [![Build Status](https://travis-ci.org/ankurcha/stemcell.png?branch=master)](https://travis-ci.org/ankurcha/stemcell)
 
-The stemcell builder is a commandline tool to create new stemcells. This product is under active development and definitely needs work. Expect things to broken and feel free to open bugs/issues. I will get to them as soon as possible.
+The stemcell builder is a commandline tool to create new [Bosh](https://www.github.com/cloudfoundry/bosh) stemcells. This product is under active development and definitely needs work. Expect things to broken and feel free to open bugs/issues. I will get to them as soon as possible.
 
 ## Installation
 
-Install virtualbox
+### Install virtualbox
 
     Follow instructions on: https://www.virtualbox.org/wiki/Downloads
 
-Install veewee
+### Install veewee
 
     $ gem install veewee --no-ri --no-rdoc
 
-Install vagrant
+### Install vagrant
 
     $ gem install vagrant --no-ri --no-rdoc
 
-Install stemcell builder
+### Install stemcell builder
 
     $ gem install stemcell_builder
+
+### Checkout BOSH source (Optional)
+
+If you want to build the BOSH agent from source.
+
+Checkout bosh 
+
+    $ git clone git://github.com/cloudfoundry/bosh.git ~/bosh
+
+You should build the agent atrifacts using the following commands
+
+    $ bundle install
+    $ bundle exec rake all:finalize_release_directory
 
 ## Usage
 
@@ -60,11 +73,29 @@ Options:
   [--ssh-port=<ssh_host_port>]                 # Port to use for the ssh tunnel to the vm, if nothing is specified a random open port will be selected
 ```
 
-In case of a redhat installation, the following additional options are available
+In case of a redhat installation, the following additional options should also be provided
 ```
   [--rhn-user=<rhn username>]                  # Redhat Network Username
   [--rhn-pass=<rhn password>]                  # Redhat Network Password
 ```
+
+## Examples
+
+To create a Ubuntu stemcell
+
+    stemcell_builder build ubuntu --agent-src-path=~/bosh/release/src/bosh/bosh_agent/ --name=bosh-ubuntu-stemcell
+
+To create a Centos stemcell
+
+    stemcell_builder build centos --agent-src-path=~/bosh/release/src/bosh/bosh_agent/ --name=bosh-centos-stemcell
+
+To create a Redhat stemcell
+
+    stemcell_builder build redhat --agent-src-path=~/bosh/release/src/bosh/bosh_agent/ --name=bosh-rhel-stemcell --rhn-user=<RHN username> --rhn-password=<RHN password>
+
+To create a Ubunut MicroBOSH stemcell
+    
+    stemcell_builder build ubuntu --micro --agent-src-path=~/bosh/release/src/bosh/bosh_agent/ --release-tar=~/bosh/release/dev_releases/micro-bosh-0.1-dev.tgz --release-manifest=~/bosh/release/micro/vsphere.yml --package-compiler=~/bosh/release/src/bosh/package_compiler/ --name=micro-bosh-stemcell
 
 ## TODO
 This tool supports only a small subset of operations. Currently, the tool is targeted
