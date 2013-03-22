@@ -134,4 +134,30 @@ module StemCellBuilderCLI
 
 end
 
+def which(cmd)
+  exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
+  ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
+    exts.each do |ext|
+      exe = "#{path}/#{cmd}#{ext}"
+      return exe if File.executable? exe
+    end
+  end
+  return nil
+end
+
+def ensure_installed(cmd, gem_name=nil)
+  gem_name ||= cmd
+  if which(cmd) 
+    puts "#{gem_name} already installed..."
+  else
+    puts "Installing #{gem_name}"
+    system "gem install #{gem_name} --no-ri --no-rdoc"
+  end
+end
+
+# ensure all gems are already installed
+ensure_installed("vagrant")
+ensure_installed("veewee")
+
+# Start StemcellBuilder
 StemCellBuilderCLI::StemCellBuilder.start(ARGV)

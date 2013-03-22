@@ -24,14 +24,16 @@ Gem::Specification.new do |gem|
   gem.rubyforge_project           = "stemcell_builder"  
 
   # Dependencies  
-  gem.add_dependency                "net-ssh", "~>2.6.6"
-  gem.add_dependency                "net-scp", "~>1.1.0"
-  gem.add_dependency                "thor", "~>0.17.0"
-  gem.add_dependency                "deep_merge", "~>1.0.0"
-  gem.add_dependency                "logger-colors", "~>1.0.0"
-  gem.add_dependency                "kwalify", "~>0.7.2"
-  gem.add_dependency                "retryable", "~>1.3.2"
+  gem.add_dependency                "net-ssh"
+  gem.add_dependency                "net-scp"
+  gem.add_dependency                "thor"
+  gem.add_dependency                "deep_merge"
+  gem.add_dependency                "logger-colors"
+  gem.add_dependency                "kwalify"
+  gem.add_dependency                "retryable"
 
-  gem.add_development_dependency    "bundler", ">= 1.0.0"  
-  gem.add_development_dependency    "rspec", "~> 2.5"
+  gem.add_development_dependency    "bundler"
+  gem.add_development_dependency    "rspec"
+  gem.add_development_dependency    "veewee"
+  gem.add_development_dependency    "vagrant"
 end

@@ -26,5 +26,5 @@ chmod +x /usr/local/bin/runonce
 # Do some firstboot clean up
 # Regenerate ssh keys
 /usr/local/bin/runonce "rm -f /etc/ssh/ssh_host_*"
-ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key -N ''
-ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N ''
+/usr/local/bin/runonce ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key -N ''
+/usr/local/bin/runonce ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N ''
