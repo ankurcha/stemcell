@@ -22,14 +22,15 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version       = Gem::Requirement.new(">= 1.9.3")
 
   # Dependencies
-  gem.add_dependency                "veewee"
-  gem.add_dependency                "net-ssh"
-  gem.add_dependency                "vagrant"
-  gem.add_dependency                "thor"
-  gem.add_dependency                "deep_merge"
-  gem.add_dependency                "logger-colors"
-  gem.add_dependency                "kwalify"
-  gem.add_dependency                "retryable"
+  gem.add_dependency                "veewee", "~>0.3.7"
+  gem.add_dependency                "net-ssh", "~>2.2.2"
+  gem.add_dependency                "net-scp", "~>1.0.4"
+  gem.add_dependency                "vagrant", "~>1.0.7"
+  gem.add_dependency                "thor", "~>0.17.0"
+  gem.add_dependency                "deep_merge", "~>1.0.0"
+  gem.add_dependency                "logger-colors", "~>1.0.0"
+  gem.add_dependency                "kwalify", "~>0.7.2"
+  gem.add_dependency                "retryable", "~>1.3.2"
 
   gem.add_development_dependency    "bundler"
   gem.add_development_dependency    "rake"
