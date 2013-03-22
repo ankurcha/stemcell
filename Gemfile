@@ -1,9 +1,14 @@
+#if RUBY_VERSION =~ /1.9/
+    #Encoding.default_external = Encoding::UTF_8
+    #Encoding.default_internal = Encoding::UTF_8
+#end
+
 source 'https://rubygems.org'
 
-# Define production dependencies here
+# development and test dependencies
+group :test do
+	gem 'rspec'
+end
 
 # Specify your gem's dependencies in builder.gemspec
 gemspec
-
-# development and test dependencies
-gem 'rspec'

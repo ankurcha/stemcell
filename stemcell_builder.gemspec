@@ -5,6 +5,7 @@ require "stemcell/version"
 
 Gem::Specification.new do |gem|
   gem.name                        = "stemcell_builder"
+  gem.rubyforge_project           = "stemcell_builder"
   gem.version                     = Bosh::Agent::StemCell::VERSION
   gem.authors                     = ["Ankur Chauhan"]
   gem.email                       = ["ankur@malloc64.com"]
@@ -20,6 +21,7 @@ Gem::Specification.new do |gem|
   gem.require_paths               = ["lib"]
   gem.required_rubygems_version   = ">= 1.3.6"
   gem.required_ruby_version       = Gem::Requirement.new(">= 1.9.3")
+  gem.platform                    = Gem::Platform::RUBY
 
   # Dependencies  
   gem.add_dependency                "net-ssh", "~>2.6.6"
@@ -30,7 +32,6 @@ Gem::Specification.new do |gem|
   gem.add_dependency                "kwalify", "~>0.7.2"
   gem.add_dependency                "retryable", "~>1.3.2"
 
-  gem.add_development_dependency    "bundler"
-  gem.add_development_dependency    "rake"
-  gem.add_development_dependency    "rspec"
+  gem.add_development_dependency    "bundler", ">= 1.0.0"  
+  gem.add_development_dependency    "rspec", "~> 2.5"
 end

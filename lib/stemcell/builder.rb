@@ -6,6 +6,7 @@ require 'digest/sha1'
 require 'net/scp'
 require 'net/ssh'
 require 'retryable'
+require 'tmpdir'
 
 module Bosh::Agent::StemCell
 
