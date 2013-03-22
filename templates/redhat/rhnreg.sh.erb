@@ -7,7 +7,9 @@ echo "Register with RHN ... "
 
 <% if ENV['HTTP_PROXY'] || ENV['http_proxy'] || ENV['https_proxy'] || ENV['HTTPS_PROXY'] %>
 	subscription-manager register --username=<%= @rhn_user %> --password=<%= @rhn_pass %> --proxy=`echo $http_proxy`
+	rhnreg_ks --nohardware --nopackages --novirtinfo --norhnsd --username="<%= @rhn_user %>" --password="<%= @rhn_pass %>" --proxy=`echo $http_proxy`
 <% else %>
 	subscription-manager register --username=<%= @rhn_user %> --password=<%= @rhn_pass %>
+	rhnreg_ks --nohardware --nopackages --novirtinfo --norhnsd --username="<%= @rhn_user %>" --password="<%= @rhn_pass %>"
 <% end %>
 
