@@ -4,8 +4,7 @@ $:.unshift(File.join(File.dirname(__FILE__), 'lib'))
 require "stemcell/version"
 
 Gem::Specification.new do |gem|
-  gem.name                        = "stemcell_builder"
-  gem.rubyforge_project           = "stemcell_builder"
+  gem.name                        = "stemcell_builder"  
   gem.version                     = Bosh::Agent::StemCell::VERSION
   gem.authors                     = ["Ankur Chauhan"]
   gem.email                       = ["ankur@malloc64.com"]
@@ -19,9 +18,10 @@ Gem::Specification.new do |gem|
   gem.executables                 = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
   gem.test_files                  = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths               = ["lib"]
-  gem.required_rubygems_version   = ">= 1.3.6"
-  gem.required_ruby_version       = Gem::Requirement.new(">= 1.9.3")
+  
   gem.platform                    = Gem::Platform::RUBY
+  gem.required_rubygems_version   = ">= 1.3.6"
+  gem.rubyforge_project           = "stemcell_builder"  
 
   # Dependencies  
   gem.add_dependency                "net-ssh", "~>2.6.6"
