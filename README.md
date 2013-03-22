@@ -1,4 +1,4 @@
-# Builder [![Build Status](https://travis-ci.org/ankurcha/stemcell.png?branch=master)](https://travis-ci.org/ankurcha/stemcell)
+# BOSH Stemcell Builder [![Build Status](https://travis-ci.org/ankurcha/stemcell.png?branch=master)](https://travis-ci.org/ankurcha/stemcell)
 
 The stemcell builder is a commandline tool to create new [BOSH](https://www.github.com/cloudfoundry/bosh) stemcells. 
 
