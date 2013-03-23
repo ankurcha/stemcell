@@ -32,6 +32,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency                "kwalify"
   gem.add_dependency                "retryable"
   gem.add_dependency                "veewee", "0.3.3"
+  gem.add_dependency                "fog", "1.9.0"
   gem.add_dependency                "vagrant", "~> 1.0.7"
   gem.add_dependency                "thor"
 

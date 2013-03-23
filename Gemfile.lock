@@ -1,8 +1,9 @@
 PATH
   remote: .
   specs:
-    stemcell_builder (1.0.6)
+    stemcell_builder (1.0.7)
       deep_merge
+      fog (= 1.9.0)
       kwalify
       logger-colors
       net-scp (~> 1.0.4)
