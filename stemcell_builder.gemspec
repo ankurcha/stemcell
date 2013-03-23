@@ -4,7 +4,7 @@ $:.unshift(File.join(File.dirname(__FILE__), 'lib'))
 require "stemcell/version"
 
 Gem::Specification.new do |gem|
-  gem.name                        = "stemcell_builder"  
+  gem.name                        = "stemcell_builder"
   gem.version                     = Bosh::Agent::StemCell::VERSION
   gem.authors                     = ["Ankur Chauhan"]
   gem.email                       = ["ankur@malloc64.com"]
@@ -21,11 +21,11 @@ Gem::Specification.new do |gem|
   
   gem.platform                    = Gem::Platform::RUBY
   gem.required_rubygems_version   = ">= 1.3.6"
-  gem.rubyforge_project           = "stemcell_builder"  
+  gem.rubyforge_project           = "stemcell_builder"
 
   # Dependencies  
-  gem.add_dependency                "net-ssh"
-  gem.add_dependency                "net-scp"
+  gem.add_dependency                "net-scp", "~> 1.0"
+  gem.add_dependency                "net-ssh", "~> 2.2.2"
   gem.add_dependency                "thor"
   gem.add_dependency                "deep_merge"
   gem.add_dependency                "logger-colors"
@@ -34,7 +34,5 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency    "bundler"
   gem.add_development_dependency    "rspec"
-  gem.add_development_dependency    "veewee"
-  gem.add_development_dependency    "vagrant"
   gem.add_development_dependency    "rubygems-tasks"
 end

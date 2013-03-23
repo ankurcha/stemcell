@@ -156,7 +156,6 @@ def ensure_installed(cmd, gem_name=nil)
 end
 
 # ensure all gems are already installed
-ensure_installed("vagrant")
 ensure_installed("veewee")
 
 # Start StemcellBuilder

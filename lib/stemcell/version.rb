@@ -4,7 +4,7 @@ module Bosh
     BOSH_PROTOCOL = 1
 
     module StemCell
-      VERSION = "1.0.5"
+      VERSION = "1.0.6"
     end
   end
 end
