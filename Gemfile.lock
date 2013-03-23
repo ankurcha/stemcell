@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    stemcell_builder (1.0.7)
+    stemcell_builder (1.0.8)
       deep_merge
       fog (= 1.9.0)
       kwalify
