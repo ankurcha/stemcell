@@ -12,6 +12,8 @@ pushd /tmp
     ./configure
     make
     make install
+    echo /usr/local/lib >> /etc/ld.so.conf
+    ldconfig
 popd
 
 # install ruby and rubygems
